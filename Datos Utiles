@@ -1,0 +1,27 @@
+Aca esta la guia basica de como crear un repo y como funcionan las "branch" (muy utiles para explorar multiples caminos en simultaneo):
+https://guides.github.com/activities/hello-world/#pr
+
+Para instalar Git en su computadora (necesario para clonar su version local): 
+http://git-scm.com/download/win
+
+Como clonar un repositorio: https://help.github.com/articles/cloning-a-repository/
+
+Para aprender como subir un archivo desde su repositorio clonado (el que tienen en la pc) se puede fijar en este link:
+https://help.github.com/articles/adding-a-file-to-a-repository-from-the-command-line/
+Esta explicado paso a paso. Cuando hagan push probablemente les pida usuario y contraseña. Acostumbrense al cmd.
+
+Lo ideal es que modifiquen el archivo y lo manden a la carpeta local y de ahí lo suban.
+
+Cada vez que quieran que su carpeta local se actualice respecto al repo, utilicen "git pull" en el directorio (desde el cmd), asegurandose
+de no tener ningun cambio en proceso (que aun no hayan hecho "push" o "commit"), lo cual va a reemplazar sus archivos en el repo local
+con los del repo virtual. Tambien va a agregarles cualquier archivo que no tengan.
+
+A la hora de pullear, es posible que tengan problemas de merge. Esto significa que uno de los archivos que tienen en su repo local no
+coincide (ni puede mergearse automaticamente) con el que ya esta en el repo. En este caso Git les avisa y tienen que abrir el archivo, el
+cual tiene cargadas ambas versiones separadas por un "========". Ahi lo combinan manualmente o eligen la version que quieran, hacen commit
+nuevamente y lo pushean.
+Cabe aclarar que esto no es muy habitual, dos personas deben haber modificado la misma parte del archivo. Si no es el caso, Git se
+encargara de mergear automaticamente, poniendo ambos cambios en el mismo archivo.
+
+A la hora de BORRAR un archivo, tienen que borrarlo manualmente de la lista en el repo y luego, desde el cmd en su carpeta local,
+tipear git rm [archivo], hacen commit y luego push. 

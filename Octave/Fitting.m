@@ -4,7 +4,9 @@ function res = fit(fcn,X,Y,A0)
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
 % para un dado conjunto de parámetros A
-  res = fminunc(f,A0); % Busco el conjunto A que minimiza el error
+  res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
+  res(length(A0)+1) = (cov(fcn(X,res),Y)/(std(fcn(X,res))*std(Y)))^2; 
+  % R-square (ver en linfit)
 endfunction
 % Ajusta una funcion cualquiera a una serie de puntos (X,Y).
 % La funcion fcn debe tener la forma fcn(x,A) donde x son los puntos
@@ -12,6 +14,50 @@ endfunction
 % Aca A0 es un vector inicial de donde empieza a buscar.
 % Aun no pude incluir los errores de X e Y, asi que los parametros
 % se devuelven sin error.
+% El último elemento del resultado será el R-square del ajuste (la 
+% forma en que lo calculo es dudosa, pero suena coherente). El resto
+% son los parámetros en el orden en que aparecen en fcn.
+% OJO: La función fcn debe poder tomar un vector de x como parámetro.
+% Esto en general no es un problema si están usando funciones básicas
+% de Octave, ya que los operadores y funciones suelen estar sobrecargados
+% y, en el caso de matrices, se aplican elemento a elemento.
+% Por ejemplo, sin([1,2,3]) = [sin(1),sin(2),sin(3)].
+
+
+%%%%%% UN EJEMPLO %%%%%%%
+% Imaginense que tienen una serie de puntos (X,Y) y quieren fittear con
+% una exponencial, osea algo de la forma f(x) = a*exp(b*x)+c. Entonces 
+% comienzan definiendo esa función ya sea de la forma clásica o usando
+% funciones anónimas/in-line (que es lo que voy a hacer a continuación).
+  % >> ExpRara = @(X,A) A(1)*exp(A(2)*X)+A(3)
+% Acá tenemos una función manipulable donde matcheamos los parámetros
+% según A = [a,b,c]. Como dije en OJO, es importante Octave pueda hacer 
+% 'exp' de una matriz (elemento a elemento). 
+% Ahora, simplemente elegimos un vector se parámetros inicial. Si tenemos
+% buen ojo, podemos ahorrarle unas cuantas cuentas a Octave, pero en
+% general no debería ser necesario.
+  % >> fit(ExpRara,X,Y,[1,1,1])
+
+%%% WE NEED TO GO DEEPER %%%
+% Para hacer un ejemplo más real, tomemos
+
+  % >> X = 0:0.1:10;
+  % >> Y = 2*exp(X/2)+rand(1,length(X))/10;
+  
+% Acá rand devuelve un vector de valores aleatorios entre 0 y 1, como
+% para darle "variación" a los resultados. Ahora fiteamos
+
+  % >> fit(ExpRara,X,Y,[1,1,1])
+  % ans =
+
+  %    1.999155   0.500038   0.057407   1.000000
+  
+% Así que podríamos decir que le pegó bastante bien, excepto en la
+% ordenada, donde le iba a pifiar porque justo ahí estaba el rand.
+% Aún así, dado que era un randoms de valores entre 0 y 1, su valor
+% promedio es justamente 0.5 (y no hay que olvidar que estaba dividido
+% por 10), asì que el resultado no es sorprendente.
+
 
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
@@ -22,10 +68,7 @@ function res = linfit(X,Ex,Y,Ey)
   aux1 = sum((X-x).*X);  % comprime sumas
   res(1) = sum((Y-y).*X)/aux1;
   res(3) = y-res(1)*x;
-  for i=1:N
-    res(2)+=((X(i)-x)*Ex(i))^2+((Y(i)+y-2*(res(1)*X(i)+res(3)))*Ey(i))^2;
-  endfor
-  res(2)=sqrt(res(2))/aux1;
+  res(2) = sqrt(sum(((X-x).*Ex).^2+((Y+y-2*(res(1)*X+res(3))).*Ey).^2))/aux1;
   res(4) = sqrt((x*res(2))^2+sum((res(1)*Ex).^2+Ey.^2)/(N^2));
   res(5) = (cov(X,Y)/(std(X)*std(Y)))^2; % La covarianza entre X e Y
 % dividido el producto de los desvios estandar nos da el coeficiente de

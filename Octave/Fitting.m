@@ -1,11 +1,17 @@
 1;
 function res = fit(fcn,X,Y,A0)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
+  T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
 % para un dado conjunto de parámetros A
   res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
   res(length(A0)+1) = (cov(fcn(X,res),Y)/(std(fcn(X,res))*std(Y)))^2; 
+  if T
+    plot(X,Y,"*");
+    hold on;
+    plot(X,fcn(X,res(1:length(res)-1)),"r");
+  endif
   % R-square (ver en linfit)
 endfunction
 % Ajusta una funcion cualquiera a una serie de puntos (X,Y).
@@ -61,6 +67,7 @@ endfunction
 
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
+  T = yes_or_no("Graficar?: ");
   N = length(X);
   res = zeros(1,5);
   x = sum(X)/N; % Calculo los promedios, lo cual no tiene ninguna
@@ -73,8 +80,13 @@ function res = linfit(X,Ex,Y,Ey)
   res(5) = (cov(X,Y)/(std(X)*std(Y)))^2; % La covarianza entre X e Y
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square
+  if T
+    errorbar(X,Y,Ex,Ey,"~>*");
+    hold on;
+    plot(X,res(1)*X+res(3),"b");
+  endif
 endfunction
 % Hace un ajuste lineal de (X,Y) con m*x+b devolviendo, en orden:
-% m, delta m, b, delta b, R-square
+%     m, delta m, b, delta b, R-square
 % En un futuro cercano le agregaré la funcionalidad de que también
 % lo grafique y capaz una forma más linda de expresar los resultados.

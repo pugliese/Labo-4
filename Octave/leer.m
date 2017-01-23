@@ -18,6 +18,7 @@
 % Puto=[1,2,3] y TuVieja=[2,4,6].
 % Como se ve en el ejemplo, los titulos no deben tener espacios,
 % pero los espacios entre números no son problema.
+% 
 % Por si las moscas, la tabla se guarda en la variable Data, pero
 % sin los titulos.
 %%% OJO1: Si las variables ya estaban definidas, las sobreescribe.
@@ -29,16 +30,48 @@
 %%% AVISO: Hay un warning de strread.m que aún no entiendo, pero
 % no parecería estar jodiendo
 
-file = input("Archivo: ", "s");
-Data = csvread(file,1,0);
-NumeroDeColumnas=columns(Data);  % Los nombres de mierda son para evitar 
-TitulosDeColumnas=textread(file,"%s , ",NumeroDeColumnas);%sobreescribir  
-for Indice=1:NumeroDeColumnas    % variables que pudieran tener de antes
-  eval([TitulosDeColumnas{Indice} "= Data(:,Indice)'"])
-endfor      % No uso el ";" para que se vean las variables que creeamos
-clear TitulosDeColumnas
-clear Indice    % Elimino las variables auxiliares que cree
-clear NumeroDeColumnas
+function res=y_or_n(mens)   % ¡HE TRIPLICADO MI PRODUCTIVIDAD!
+  aux = input([mens " (y or n) "],"s");
+  if aux=="y"
+    res = 1;
+  else
+    res = 0;
+  endif
+endfunction
+
+fiiile = input("Archivo: ", "s");
+if y_or_n("¿Correr predeterminado?")
+  ModoDeCargado = [1,1,0];
+else
+  ModoDeCargado = zeros(1,3);
+  ModoDeCargado(1) = y_or_n("¿Crear variables?");
+  ModoDeCargado(2) = y_or_n("¿Titulos en archivo?");
+  if ModoDeCargado(2) 
+    ModoDeCargado(3) = y_or_n("¿Redefinir titulos?");
+  endif
+endif
+Data = csvread(fiiile, ModoDeCargado(2),0);
+if ModoDeCargado(1)
+  NumeroDeColumnas=columns(Data);
+  TitulosDeColumnas=textread(fiiile,"%s, ",NumeroDeColumnas);
+  if 1-ModoDeCargado(2) || ModoDeCargado(3)
+    printf("\nInserte los titulos de cada columna\n")
+    for Indice=1:NumeroDeColumnas
+      printf("%d", Indice)
+      TitulosDeColumnas{Indice} = input("-esima columna ","s");
+    endfor
+  endif
+  for Indice=1:NumeroDeColumnas
+    if length(TitulosDeColumnas{Indice})!=0
+      eval([TitulosDeColumnas{Indice} "= Data(:,Indice)'"])
+    endif
+  endfor      % No uso el ";" para que se vean las variables que creeamos
+  clear TitulosDeColumnas
+  clear Indice    % Elimino las variables auxiliares que cree
+  clear NumeroDeColumnas
+endif
+clear ModoDeCargado
+clear fiiile
 
 % Mejoras futuras:  - Poder cargar múltiples tablas de un mismo archivo 
 %                   - Que no sea necesario que cada columna tenga titulo,

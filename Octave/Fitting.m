@@ -6,11 +6,12 @@ function res = fit(fcn,X,Y,A0)
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
 % para un dado conjunto de parámetros A
   res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
-  res(length(A0)+1) = (cov(fcn(X,res),Y)/(std(fcn(X,res))*std(Y)))^2; 
+  res(length(A0)+1) = corr(fcn(X,res),Y)^2; 
   if T
     plot(X,Y,"*");
     hold on;
     plot(X,fcn(X,res(1:length(res)-1)),"r");
+    hold off;
   endif
   % R-square (ver en linfit)
 endfunction
@@ -77,13 +78,14 @@ function res = linfit(X,Ex,Y,Ey)
   res(3) = y-res(1)*x;
   res(2) = sqrt(sum(((X-x).*Ex).^2+((Y+y-2*(res(1)*X+res(3))).*Ey).^2))/aux1;
   res(4) = sqrt((x*res(2))^2+sum((res(1)*Ex).^2+Ey.^2)/(N^2));
-  res(5) = (cov(X,Y)/(std(X)*std(Y)))^2; % La covarianza entre X e Y
+  res(5) = corr(X,Y)^2; % La covarianza entre X e Y
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square
   if T
     errorbar(X,Y,Ex,Ey,"~>*");
     hold on;
     plot(X,res(1)*X+res(3),"b");
+    hold off;
   endif
 endfunction
 % Hace un ajuste lineal de (X,Y) con m*x+b devolviendo, en orden:

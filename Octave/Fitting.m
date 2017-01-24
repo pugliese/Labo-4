@@ -1,19 +1,37 @@
 1;
-function res = fit(fcn,X,Y,A0)
+function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
 % para un dado conjunto de parámetros A
+  k = length(A0);
+  N = length(X);
   res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
-  res(length(A0)+1) = corr(fcn(X,res),Y)^2; 
+  res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
   if T
     plot(X,Y,"*");
     hold on;
     plot(X,fcn(X,res(1:length(res)-1)),"r");
     hold off;
   endif
-  % R-square (ver en linfit)
+  if Ex != 0 && Ey!=0
+    D = zeros(k,2*N);
+    inc = zeros(1,N);
+    for j=1:N
+      inc(j) = 1E-6;
+      f1 = @(A) sum((Y-fcn(X+inc,A)).^2);
+      f2 = @(A) sum((Y-fcn(X-inc,A)).^2);
+      D(:,j) = (fminunc(f1,res(1:k))-fminunc(f2,res(1:k)))*5E5;
+      f1 = @(A) sum((Y+inc-fcn(X,A)).^2);
+      f2 = @(A) sum((Y-inc-fcn(X,A)).^2);
+      D(:,N+j) = (fminunc(f1,res(1:k))-fminunc(f2,res(1:k)))*5E5;
+      inc(j) = 0;
+    endfor
+    error = sqrt(([Ex Ey].^2)*(D.^2)');
+  else
+    error = zeros(1,k);
+  endif      
 endfunction
 % Ajusta una funcion cualquiera a una serie de puntos (X,Y).
 % La funcion fcn debe tener la forma fcn(x,A) donde x son los puntos
@@ -92,3 +110,44 @@ endfunction
 %     m, delta m, b, delta b, R-square
 % En un futuro cercano le agregaré la funcionalidad de que también
 % lo grafique y capaz una forma más linda de expresar los resultados.
+
+
+function res = IntConf(X,p=.95)
+  res = zeros(1,2);
+  res(1) = sum(X)/length(X);
+  res(2) = std(X)*stdnormal_inv(p)/sqrt(length(X));
+endfunction
+
+
+
+
+
+
+
+
+
+%%% FUNCIONES AUXILIARES (por ahora al pedo) %%%%
+
+
+function res = dp(f,i,a=1E-6)
+  res = @(Ao) (f(Ao+inc(Ao,i,a))-f(Ao-inc(Ao,i,a)))/(2*a);
+endfunction
+
+function res = dp2(f,i,j,a=1E-6)
+  res = dp(dp(f,i,a),j,a);
+endfunction
+
+function inc = inc(V,i,a)
+  inc = zeros(1,length(V));
+  inc(i) = a;
+endfunction
+
+function res = Hes(f,Ao,a=1E-6)
+  res = zeros(1,length(Ao));
+  for i=1:length(Ao)
+    for j=i:length(Ao)
+      res(i,j) = dp2(f,i,j,a)(Ao);
+      res(j,i) = res(i,j);
+    endfor
+  endfor
+endfunction

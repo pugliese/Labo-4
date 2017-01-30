@@ -79,6 +79,8 @@ clear fiiile
 % En este modo, se pregunta inicialmente si quiere correrse en modo 
 % predeterminado. Si no, se abren más opciones para customizar la
 % lectura de datos.
+% A esta versión es posible agregarle la opción de exceptuar columnas
+% de la versión 2, pero solo lo voy a hacer si les gusta más la v1.
 
 
 
@@ -86,39 +88,47 @@ clear fiiile
 
 fiiile = input("Archivo: ", "s");
 clear ModoDeCargado;
-[fiiile,ModoDeCargado] = strread(fiiile, "%s %s");
+[fiiile,ModoDeCargado,ColumnasImportantes] = strread(fiiile, "%s %s %s");
 fiiile = fiiile{1};
+if length(ColumnasImportantes)!=0
+  ColumnasImportantes = eval(["[" ColumnasImportantes{1} "]"]);
+else
+  ColumnasImportantes = [];
+endif
 if length(ModoDeCargado)!=0
   ModoDeCargado = eval(["[" ModoDeCargado{1} "]"]);
 endif
-if length(ModoDeCargado)==2 && ModoDeCargado!=[1,1]
+if length(ModoDeCargado)==2 && sum(ModoDeCargado!=[1,1])!=0
   ModoDeCargado = [ModoDeCargado 0];
 elseif length(ModoDeCargado)==3
-
+% Si tiene longitud 3 no puede estar mal
+elseif length(ModoDeCargado)==0
+  ModoDeCargado = [1,1,0];
 else
   disp("ERROR: Deben suministrarse 3 booleanos\nCorriendo en modo predeterminado");
   ModoDeCargado = [1,1,0];
 endif
+SeCrea = @(i) (sum(i==ColumnasImportantes)>0 & 1-ModoDeCargado(1)) | (sum(i==ColumnasImportantes)==0 & ModoDeCargado(1));
 Data = csvread(fiiile, ModoDeCargado(2),0);
-if ModoDeCargado(1)
-  NumeroDeColumnas=columns(Data);
-  TitulosDeColumnas=textread(fiiile,"%s, ",NumeroDeColumnas);
-  if 1-ModoDeCargado(2) || ModoDeCargado(3)
-    printf("\nInserte los titulos de cada columna\n")
-    for Indice=1:NumeroDeColumnas
+NumeroDeColumnas=columns(Data);
+TitulosDeColumnas=textread(fiiile, "%s, ",NumeroDeColumnas);
+if 1-ModoDeCargado(2) || ModoDeCargado(3)
+  printf("\nInserte los titulos de cada columna\n")
+  for Indice=1:NumeroDeColumnas
+    if SeCrea(Indice)
       printf("%d", Indice)
       TitulosDeColumnas{Indice} = input("-esima columna ","s");
-    endfor
-  endif
-  for Indice=1:NumeroDeColumnas
-    if length(TitulosDeColumnas{Indice})!=0
-      eval([TitulosDeColumnas{Indice} "= Data(:,Indice)'"])
     endif
-  endfor      % No uso el ";" para que se vean las variables que creeamos
-  clear TitulosDeColumnas
-  clear Indice    % Elimino las variables auxiliares que cree
-  clear NumeroDeColumnas
+  endfor
 endif
+for Indice=1:NumeroDeColumnas
+  if length(TitulosDeColumnas{Indice})!=0 & SeCrea(Indice)
+    eval([TitulosDeColumnas{Indice} "= Data(:,Indice)'"])
+  endif
+endfor      % No uso el ";" para que se vean las variables que creeamos
+clear TitulosDeColumnas
+clear Indice    % Elimino las variables auxiliares que cree
+clear NumeroDeColumnas
 clear ModoDeCargado
 clear fiiile
 % En este modo, el usuario debe indicar junto al nombre del archivo
@@ -126,8 +136,8 @@ clear fiiile
 % a las mismas preguntas que en el modo anterior.
 % Si solo escribimos el nombre del archivo, corre en predeterminado.
 % El vector no tiene que estar entre corchetes y puede no contener
-% un tercer elemento si los dos primeros son distintos de "1,1" 
-% (ver las preguntas a continuación).
+% un tercer elemento si los dos primeros son distintos de "1,1", pero 
+% no puede haber espacios (ver las preguntas a continuación).
   % Por ejemplo, si queremos cargar el archivo "puto.txt" sin
   % títulos y no queremos guardar las variables tenemos
   %   >> run leer.m
@@ -138,12 +148,16 @@ clear fiiile
   %   >> run leer.m
   %   >> Archivo: puto.txt [1,0,0]
   % Nuevamente, el tercer valor y los corchetes son innecesarios.
-% En un futuro podría agregarse después del vector de booleanos un
-% vector de enteros que diga que columnas deben definirse como
-% variables y cuales no (Idea a futuro).
+  
+% Además, puede agregarse un vector de enteros para determinar 
+% las EXCEPCIONES a la primer respuesta. Si fue 1, entonces son 
+% las que NO deben crearse. Si fue 0, son las que DEBEN crearse.
+% Los valores se toman empezando a contar desde el 1 de izquiera 
+% a derecha. Si hay repetidos o valores fuera de rango, se ignoran. 
+% Si no se proporciona el vector, se asume vacío.
   
 
-% Las preguntas significan lo siguiente
+% Las preguntas (en orden de aparición) significan lo siguiente
   % - ¿Crear variables? Un "n" implica que no se crean variables para
   %   cada columna. Independientemente, la tabla se guarda en Data.
   % - ¿Títulos en archivo? Si en la tabla no hay títulos, debe ponerse

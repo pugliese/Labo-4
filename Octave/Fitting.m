@@ -39,9 +39,14 @@ endfunction
 % Aca A0 es un vector inicial de donde empieza a buscar.
 % Aun no pude incluir los errores de X e Y, asi que los parametros
 % se devuelven sin error.
-% El último elemento del resultado será el R-square del ajuste (la 
-% forma en que lo calculo es dudosa, pero suena coherente). El resto
-% son los parámetros en el orden en que aparecen en fcn.
+% El último elemento del resultado (res) será el R-square del ajuste 
+% (la forma en que lo calculo es dudosa, pero suena coherente). El 
+% resto son los parámetros en el orden en que aparecen en fcn.
+% Si no se especifican errores, devuelve el parámetro "error" vacío.
+% Similarmente, si quieren los errores tienen que llamar a la función
+% asignando de la forma
+  % >> [parametros, errores] = fit(...)
+  
 % OJO: La función fcn debe poder tomar un vector de x como parámetro.
 % Esto en general no es un problema si están usando funciones básicas
 % de Octave, ya que los operadores y funciones suelen estar sobrecargados
@@ -81,7 +86,7 @@ endfunction
 % ordenada, donde le iba a pifiar porque justo ahí estaba el rand.
 % Aún así, dado que era un randoms de valores entre 0 y 1, su valor
 % promedio es justamente 0.5 (y no hay que olvidar que estaba dividido
-% por 10), asì que el resultado no es sorprendente.
+% por 10), así que el resultado no es sorprendente.
 
 
 function res = linfit(X,Ex,Y,Ey)
@@ -118,6 +123,10 @@ function res = IntConf(X,p=.95)
   res(2) = std(X)*stdnormal_inv(p)/sqrt(length(X));
 endfunction
 
+% Intervalo de Confianza de nivel p de la variable aleatoria X.
+% No hay mucho que decir, el formato es 
+%  promedio, error
+
 
 
 
@@ -129,11 +138,11 @@ endfunction
 %%% FUNCIONES AUXILIARES (por ahora al pedo) %%%%
 
 
-function res = dp(f,i,a=1E-6)
+function res = dp(f,i=1,a=1E-6)
   res = @(Ao) (f(Ao+inc(Ao,i,a))-f(Ao-inc(Ao,i,a)))/(2*a);
 endfunction
 
-function res = dp2(f,i,j,a=1E-6)
+function res = dp2(f,i=1,j,a=1E-6)
   res = dp(dp(f,i,a),j,a);
 endfunction
 

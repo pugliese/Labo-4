@@ -10,7 +10,7 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0)
   res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
   if T
-    plot(X,Y,"*");
+    plot(X,Y,"o");
     hold on;
     plot(X,fcn(X,res(1:length(res)-1)),"r");
     hold off;
@@ -105,9 +105,9 @@ function res = linfit(X,Ex,Y,Ey)
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square
   if T
-    errorbar(X,Y,Ex,Ey,"~>*");
+    errorbar(X,Y,Ex,Ey,"~>o");
     hold on;
-    plot(X,res(1)*X+res(3),"b");
+    plot(X,res(1)*X+res(3),"r");
     hold off;
   endif
 endfunction

@@ -31,7 +31,7 @@
 
 function res=y_or_n(mens)   % ¡HE TRIPLICADO MI PRODUCTIVIDAD!
   aux = "Hola";
-  while aux!= "y" & aux!="n"
+  while aux!= "y" && aux!="n"
     aux = input([mens " (y or n) "],"s");
   endwhile
   if aux=="y"
@@ -186,3 +186,10 @@ clear fiiile
 % Todo sobre graficos está en 271-299, con especial enfasis en 272-274
 % para la función "plot". 
 % Para agregar todos los detalles, ver 327-333
+% Al usar xlabel,ylabel,title y legend, luego del texto es posible 
+% agregar el tipo de fuente y tamaño para el texto. Por ejemplo, 
+  % >> xlabel('Etiqueta del eje x','FontName','Arial','FontSize', 14);
+% Genera un label Arial 14. Es una paja pero garpa.
+% Luego, puede guardarse escribiendo saveas(1,NombreArchivo,formato)
+% donde NombreArchivo y formato son strings y formato puede ser jpg,
+% png, pdf, eps, ps o emf.

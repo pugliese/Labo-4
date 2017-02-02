@@ -15,7 +15,7 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0)
     plot(X,fcn(X,res(1:length(res)-1)),"r");
     hold off;
   endif
-  if Ex != 0 && Ey!=0
+  if Ex != 0 | Ey!=0
     D = zeros(k,2*N);
     inc = zeros(1,N);
     for j=1:N

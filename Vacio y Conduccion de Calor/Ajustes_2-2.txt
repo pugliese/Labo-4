@@ -1,0 +1,6 @@
+Vacio De Mecánica:
+Ajuste con a*exp(-b*t)+c
+
+	* Sola: a = 3.459E9 ; b = 1.6635 ; c = -3.2336E-2 ; R-square = 0.96043
+	* ConDif: a = 1.02023 ; b = 0.70773 ; c = 1.1281 ; R-square = 0.92584
+	* ConTodo: a = 1.00075 ; b = 0.98773 ; c = 0.96507 ; R-square = 0.96726

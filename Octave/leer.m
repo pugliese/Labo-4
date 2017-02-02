@@ -41,46 +41,7 @@ function res=y_or_n(mens)   % ¡HE TRIPLICADO MI PRODUCTIVIDAD!
   endif
 endfunction
 
-    %%%%% VERSION 1 (interactiva) %%%%%
 
-fiiile = input("Archivo: ", "s");
-if y_or_n("¿Correr predeterminado?")
-  ModoDeCargado = [1,1,0];
-else
-  ModoDeCargado = zeros(1,3);
-  ModoDeCargado(1) = y_or_n("¿Crear variables?");
-  ModoDeCargado(2) = y_or_n("¿Titulos en archivo?");
-  if ModoDeCargado(2)==1 & ModoDeCargado(1)==1
-    ModoDeCargado(3) = y_or_n("¿Redefinir titulos?");
-  endif
-endif
-Data = csvread(fiiile, ModoDeCargado(2),0);
-if ModoDeCargado(1)
-  NumeroDeColumnas=columns(Data);
-  TitulosDeColumnas=textread(fiiile,"%s, ",NumeroDeColumnas);
-  if 1-ModoDeCargado(2) || ModoDeCargado(3)
-    printf("\nInserte los titulos de cada columna\n")
-    for Indice=1:NumeroDeColumnas
-      printf("%d", Indice)
-      TitulosDeColumnas{Indice} = input("-esima columna ","s");
-    endfor
-  endif
-  for Indice=1:NumeroDeColumnas
-    if length(TitulosDeColumnas{Indice})!=0
-      eval([TitulosDeColumnas{Indice} "= Data(:,Indice)'"])
-    endif
-  endfor      % No uso el ";" para que se vean las variables que creeamos
-  clear TitulosDeColumnas
-  clear Indice    % Elimino las variables auxiliares que cree
-  clear NumeroDeColumnas
-endif
-clear ModoDeCargado
-clear fiiile
-% En este modo, se pregunta inicialmente si quiere correrse en modo 
-% predeterminado. Si no, se abren más opciones para customizar la
-% lectura de datos.
-% A esta versión es posible agregarle la opción de exceptuar columnas
-% de la versión 2, pero solo lo voy a hacer si les gusta más la v1.
 
 
 
@@ -131,6 +92,8 @@ clear Indice    % Elimino las variables auxiliares que cree
 clear NumeroDeColumnas
 clear ModoDeCargado
 clear fiiile
+clear SeCrea
+clear ColumnasImportantes
 % En este modo, el usuario debe indicar junto al nombre del archivo
 % un vector de booleanos (1's y 0's) que responden respectivamente
 % a las mismas preguntas que en el modo anterior.

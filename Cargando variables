@@ -1,0 +1,20 @@
+Imaginense que yo estuve 1 hora haciendo ajustes y tengo múltiples parámetros con sus errores. Claramente, podría escribirlo en algún txt
+y tenerlo ahí. ¿Pero que pasa si de golpe quiero volver a trabajar con las mismas variables? ¿Las copio a mano? ¿Las paso al formato de 
+leer.m para cargarlas automáticamente? Todas son una paja, así que les ofrezco una solución infinitamente mejor.
+
+Mientras trabajamos con Octave, hay un par de comandos "save" y "load" que nos pueden ayudar. Podemos llamar a la funcion "save" para
+guardar todas (o algunas) de las variables actualmente definidas en Octave en algún txt en un formato especial y llamamos a "load" para 
+cargarlas. La forma de hacerlo es
+  >> save NombreArchivo Opciones v1 v2 .. vn
+Acá NombreArchivo es el nombre del archivo donde las guardaremos. Si no existe, lo crea. Si existe, lo sobreescribe a menos que en la
+parte de Opciones se escriba -append, en cuyo caso se agrega al final. Cabe aclarar que podemos pasar por alto Opciones (no ponerlo).
+Las vi son los nombres de las variables que queremos guardar. Si no ponemos ninguna variable, guarda todas por default.
+Para load el formato es similar, pero las Opciones casi no se usan, así que en general es
+  >> load NombreArchivo v1 v2 .. vn
+Acá las vi son las variables que queremos cargar y, si no especificamos ninguna, nos carga todas por default. Es importante notar que
+tenemos que conocer de antemano el nombre de las variables.
+
+Por ejemplo, yo ahora voy a subir los parámetros de los ajustes de las curvas de enfriamiento y calentamiento junto con las formas 
+funcionales que utilicé para fitear.
+
+Si quieren profundizar, toda la información sobre estas funciones está en OctaveGuide, páginas 238-242.

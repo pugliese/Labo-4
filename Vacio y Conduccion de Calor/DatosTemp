@@ -1,0 +1,46 @@
+# Created by Octave 4.2.0, Sat Feb 04 23:08:43 2017 GMT <unknown@unknown>
+# name: tempC
+# type: function handle
+@<anonymous>
+@(x, A) A (1) * (1 - exp (-x / A (2)))
+
+
+# name: dtempC
+# type: function handle
+@<anonymous>
+@(x, A) A (1) * exp (-x / A (2)) / A (2)
+
+
+# name: CV
+# type: matrix
+# rows: 1
+# columns: 3
+ 172.6034123208156 1290.808008882575 0.9994210602066905
+
+
+# name: CVE
+# type: matrix
+# rows: 1
+# columns: 2
+ 16.9081581097286 202.463019392717
+
+
+# name: tempE
+# type: function handle
+@<anonymous>
+@(x, A) A (1) * exp (-x / A (2))
+
+
+# name: dtempE
+# type: function handle
+@<anonymous>
+@(x, A) -A (1) * exp (-x / A (2)) / A (2)
+
+
+# name: EA
+# type: matrix
+# rows: 1
+# columns: 5
+ -25.8905171538798 1.559985177240741 228.7834373396317 8.489653714847769 0.9948009142768168
+
+

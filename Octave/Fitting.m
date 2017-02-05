@@ -1,5 +1,5 @@
 1;
-function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0)
+function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
@@ -7,30 +7,40 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0)
 % para un dado conjunto de parámetros A
   k = length(A0);
   N = length(X);
-  res = [fminunc(f,A0), 0]; % Busco el conjunto A que minimiza el error
+  [res,dist,inf,out,grad,hess]= fminunc(f,A0); % Busco el conjunto A que minimiza el error
+  res = [res 0];
+  A_ = inv(hess);
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
-  if T
-    plot(X,Y,"o");
-    hold on;
-    plot(X,fcn(X,res(1:length(res)-1)),"r");
-    hold off;
-  endif
   if Ex != 0 | Ey!=0
-    D = zeros(k,2*N);
-    inc = zeros(1,N);
-    for j=1:N
-      inc(j) = 1E-6;
-      f1 = @(A) sum((Y-fcn(X+inc,A)).^2);
-      f2 = @(A) sum((Y-fcn(X-inc,A)).^2);
-      D(:,j) = (fminunc(f1,res(1:k))-fminunc(f2,res(1:k)))*5E5;
-      f1 = @(A) sum((Y+inc-fcn(X,A)).^2);
-      f2 = @(A) sum((Y-inc-fcn(X,A)).^2);
-      D(:,N+j) = (fminunc(f1,res(1:k))-fminunc(f2,res(1:k)))*5E5;
-      inc(j) = 0;
+    B = zeros(k,2*N);
+    for m=1:k
+      for j=1:N
+        a = res(1:k);
+        a(m) = 0;
+        fj = @(mu) fcn(X(j),a+[zeros(1,m-1) mu zeros(1,k-m)]);
+        dfj = @(mu) dfcn(X(j),a+[zeros(1,m-1) mu zeros(1,k-m)]);
+        a = gradient(fj,res(m),max(res(m)*1E-6,1E-10));
+        b = gradient(dfj,res(m),max(res(m)*1E-6,1E-10));
+        B(m,j)= b*(fcn(X(j),res(1:k))-Y(j))+a*dfcn(X(j),res(1:k));
+        B(m,j+N) = -a;
+      endfor
     endfor
-    error = sqrt(([Ex Ey].^2)*(D.^2)');
+    B = 2*B;
+    error = sqrt(([Ex Ey].^2)*((A_*B).^2)');
+    if T
+      errorbar(X,Y,Ex,Ey,"~>o");
+      hold on;
+      plot(X,fcn(X,res(1:k)),"r");
+      hold off;
+    endif
   else
     error = zeros(1,k);
+    if T
+      plot(X,Y,"o");
+      hold on;
+      plot(X,fcn(X,res(1:length(res)-1)),"r");
+      hold off;
+    endif
   endif      
 endfunction
 % Ajusta una funcion cualquiera a una serie de puntos (X,Y).
@@ -89,6 +99,9 @@ endfunction
 % por 10), así que el resultado no es sorprendente.
 
 
+
+
+
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
@@ -99,8 +112,10 @@ function res = linfit(X,Ex,Y,Ey)
   aux1 = sum((X-x).*X);  % comprime sumas
   res(1) = sum((Y-y).*X)/aux1;
   res(3) = y-res(1)*x;
-  res(2) = sqrt(sum(((X-x).*Ex).^2+((Y+y-2*(res(1)*X+res(3))).*Ey).^2))/aux1;
-  res(4) = sqrt((x*res(2))^2+sum((res(1)*Ex).^2+Ey.^2)/(N^2));
+  dmdy = (X-x)/aux1;
+  dmdx = (Y+y-2*(res(1)*X+res(3)))/aux1;
+  res(2) = sqrt((dmdx.^2)*(Ex'.^2)+(dmdy.^2)*(Ey'.^2));
+  res(4) = sqrt((res(1)/N+x*dmdx).^2*Ex'.^2+(1/N-x*dmdy).^2*Ey'.^2);
   res(5) = corr(X,Y)^2; % La covarianza entre X e Y
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square

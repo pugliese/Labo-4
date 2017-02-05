@@ -43,8 +43,6 @@ endfunction
 
 
 
-
-
     %%%%% VERSION 2 (rápida) %%%%%
 
 fiiile = input("Archivo: ", "s");

@@ -1,0 +1,37 @@
+# Created by Octave 4.2.0, Sun Feb 05 21:47:18 2017 GMT <unknown@unknown>
+# name: Mod1
+# type: function handle
+@<anonymous>
+@(T, A) A (1) * T + A (2) * T .^ (-1) + A (3)
+
+
+# name: Exp1
+# type: function handle
+@<anonymous>
+@(T, A) A (1) * exp (-A (2) * T) + A (3)
+
+
+# name: Lin
+# type: function handle
+@<anonymous>
+@(T, A) A (1) * T + A (2)
+
+
+# name: Mod2
+# type: function handle
+@<anonymous>
+@(T, A) A (1) * T + A (2) * T .^ (-1) + A (3) * T .^ (-2) + A (4)
+
+
+# name: DMod1
+# type: function handle
+@<anonymous>
+@(T, A) A (1) - A (2) * T .^ (-1)
+
+
+# name: DMod2
+# type: function handle
+@<anonymous>
+@(T, A) A (1) - A (2) * T .^ (-2) - 2 * A (3) .^ (-3)
+
+

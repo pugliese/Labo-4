@@ -1,0 +1,15 @@
+# Created by Octave 4.2.0, Mon Feb 06 14:16:25 2017 GMT <unknown@unknown>
+# name: Param
+# type: matrix
+# rows: 1
+# columns: 4
+ -1.886460253388448e-005 43.16007470920839 -1.441730588674001 0.9504306139599739
+
+
+# name: Err
+# type: matrix
+# rows: 1
+# columns: 3
+ 7.499718708193693e-006 0.2153272515174617 0.003378724444349306
+
+

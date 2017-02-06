@@ -2,7 +2,6 @@
 function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   assert(length(X)==length(Y))
   assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
-  assert(length(Ex)==length(X))
   T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
@@ -14,6 +13,12 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   A_ = inv(hess);
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
   if Ex != 0 | Ey!=0
+    if class(Ex)=="double" && length(Ex)==1
+      Ex = ones(1,length(X))*Ex;
+    endif
+    if class(Ey)=="double" && length(Ey)==1
+      Ey = ones(1,length(Y))*Ey;
+    endif
     if length(class(dfcn))!=length("function_handle") || class(dfcn) != "function_handle"
       dfcn = @(x,A) (fcn(x+max(x*1E-6,1E-10),A)-fcn(x-max(x*1E-6,1E-10),A))/(2*max(x*1E-6,1E-10));
     endif
@@ -115,13 +120,20 @@ endfunction
   % >> [Param, Err] = fit(ExpRara,X,Y,[1,1,1],Ex,Ey,DerivExpRara)
 % Y obtenemos como resultado los mismos parámetros de antes en Param y 
 % una variable más Err con los errores de estos parámetros.
+% Si los errores son constantes, basta con ponerlo como un número y el
+% programa se encarga de hacerlo vector.
 
 
 
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y))
   assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
-  assert(length(Ex)==length(X))
+  if class(Ex)=="double" && length(Ex)==1
+    Ex = ones(1,length(X))*Ex;
+  endif
+  if class(Ey)=="double" && length(Ey)==1
+    Ey = ones(1,length(Y))*Ey;
+  endif
   T = yes_or_no("Graficar?: ");
   N = length(X);
   res = zeros(1,5);

@@ -8,6 +8,7 @@
 \usepackage{enumerate} % enumerados
 \usepackage[utf8]{inputenc} % acentos sin codigo
 \usepackage{graphicx}
+\usepackage{multicol}
 
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
@@ -74,16 +75,17 @@ Preguntas de Ferromagnetismo para el pelado botón
 	\item \textbf{¿Cómo funciona un transformador, un transformador diferencial y un auto-transformador?¿Para qué se usa cada uno?}
 	\item \textbf{¿Cómo funciona un circuito integrador? Calcule la función de transferencia y la frecuencia de corte.} 
 	
-	Un circuito integrador es aquel que integra la señal de entrada y la devuelve a la salida. Se construye como un RC serie donde la señal de salida es la caída de potencial en el capacitor. 
-	
 	\begin{figure}[h]
 		\centering
 		\includegraphics[scale=0.75]{integrador.png}
 		\caption{Hola, soy un circuito pedorro}
-		\label{CH}
+		\label{Int}
 	\end{figure}
 	
-	Para frecuencias mayores a la frecuencia de corte $f_c = 1/2\pi RC$ la función de transferencia resulta $T = 1/\omega RC$
+	El voltaje de salida $complejo$ es \[\mathbb{V}_s = \frac{Z_c}{Z}\mathbb{V}_e = \frac{\mathbb{V}_e}{(R+\frac{1}{i\omega C})i\omega C} = \frac{V_ee^{i\omega t}}{1+i\omega CR}\approx \frac{V_e e^{i\omega t} }{i\omega C R} = \frac{1}{RC}\int \mathbb{V}_e dt\]
+	donde usamos que $\omega CR\gg 1$. Bajo esta aproximación vemos que la señal de salida es proporcional a la primitiva de la señal de entrada. Esto es equivalente a $\omega \gg 1/RC \equiv \omega_c$ por lo que tenemos una frecuencia de corte \[ f_c = \frac{1}{2\pi RC} \]
+	
+	La función de transferencia para este circuito es \[ T(\omega) = \Big| \frac{\mathbb{V}_s}{\mathbb{V}_e} \Big| = \frac{1}{\sqrt{1+\big( \frac{\omega}{\omega_c} \big)^2}}\approx \frac{\omega_c}{\omega} \qquad \text{para } \omega\gg \omega_c \]
 	
 	\item \textbf{¿Qué significa la integral de la curva de histéresis?}
 	

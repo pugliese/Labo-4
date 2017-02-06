@@ -1,0 +1,84 @@
+\documentclass[a4paper,10pt,fleqn,oneside]{article}
+\usepackage{amsmath,amsfonts,amssymb}   %paquetes útiles, contienen símbolos
+%\usepackage{enumitem}					%hace más facil manejar listas numeradas
+\usepackage[osf,noBBpl]{mathpazo}		%tipo de letra 
+\usepackage[utf8]{inputenc}				
+\usepackage[T1]{fontenc}				%para poder usar tildes sin problemas
+\usepackage[left=1cm,right=1cm,top=1cm,bottom=1cm,headheight=13.6pt]{geometry}
+\usepackage{enumerate} % enumerados
+\usepackage[utf8]{inputenc} % acentos sin codigo
+\usepackage{graphicx}
+
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[poly,arrow,curve,matrix]{xy}
+\usepackage{array}
+\usepackage{leftidx}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage[ampersand]{easylist}
+% Abreviaturas
+\newcommand\CC{\mathbb{C}}
+\newcommand\RR{\mathbb{R}}
+\newcommand\QQ{\mathbb{Q}}
+\newcommand\ZZ{\mathbb{Z}}
+\newcommand\NN{\mathbb{N}}
+\renewcommand\emptyset{\varnothing}
+\newcommand\nbd\nobreakdash
+\newcommand\Sum{\displaystyle\sum}
+\renewcommand{\baselinestretch}{1.2}
+\newcommand{\eps}{\varepsilon}
+\providecommand{\modu}[1]{\vert\vert#1\vert\vert}
+\begin{document}
+
+
+%%\begin{center}
+%%\begin{large}
+%Cálculo avanzado - Primer cuatrimestre
+
+%\bigskip
+%Ejercicio para entregar
+
+%\bigskip
+%Bryan Malpartida
+%\end{large}
+%\end{center}
+\bigskip
+\noindent
+\centering
+Preguntas de Ferromagnetismo para el pelado botón
+
+
+\begin{enumerate}[1.]
+	\item \textbf{Explique los comportamientos ferromagneticos, paramagneticos y diamagneticos.}
+		 
+		 Estos fenómenos son producido por la falta de amor en el mundo 
+	\item \textbf{¿Qué es una curva de histéresis? Grafique e indique la magnetización remanente y la coercitividad.}
+	
+		La curva de histéresis muestra la magnetización de un material en función a la intensidad del campo magnético que la induce.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{histeresis.jpg}
+	\caption{Hola, soy la curva de histéresis}
+	\label{CH}
+\end{figure}		
+		
+	\item \textbf{¿Qué es la temperatura de Curie? Explique que sucede con el material por debajo y por encima de la $\mathbf{T_c}$.}
+	
+	La temperatura de Curie de un material es la temperatura a partir de la cual el material pasa de un comportamiento ferromagnético a paramagnético.
+	\item \textbf{¿Qué son los materiales magnéticamente duros y blandos?¿Para qué se usan?}
+	
+	Los materiales magnéticamente duros son aquellos que, una vez magnetizados, conservan dicha magnetización de manera permanente, mientras que los blandos tienden a perderla fácilmente.
+	Los duros se pueden utilizar en motores eléctricos y generadores de corriente continua entre otros; y los blandos se pueden usar en transformadores, generadores, electroimanes etc.
+	\item \textbf{¿Cómo funciona un transformador, un transformador diferencial y un auto-transformador?¿Para qué se usa cada uno?}
+	\item \textbf{¿Cómo funciona un circuito integrador? Calcule la función de transferencia y la frecuencia de corte.}
+	\item \textbf{¿Qué significa la integral de la curva de histéresis?}
+	
+	El área bajo la curva es proporcional a la energía perdida como calor durante la magnetización. 
+	\item \textbf{¿Depende el comportamiento de hístéresis de la frecuencia?¿Y de la temperatura? Explique.}
+	
+\end{enumerate}
+
+
+\end{document}

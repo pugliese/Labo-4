@@ -1,6 +1,8 @@
 1;
 function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
-  assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
+  assert(length(X)==length(Y))
+  assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
+  assert(length(Ex)==length(X))
   T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
@@ -12,6 +14,9 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   A_ = inv(hess);
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
   if Ex != 0 | Ey!=0
+    if length(class(dfcn))!=length("function_handle") || class(dfcn) != "function_handle"
+      dfcn = @(x,A) (fcn(x+max(x*1E-6,1E-10),A)-fcn(x-max(x*1E-6,1E-10),A))/(2*max(x*1E-6,1E-10));
+    endif
     B = zeros(k,2*N);
     for m=1:k
       for j=1:N
@@ -53,11 +58,14 @@ endfunction
 % (la forma en que lo calculo es dudosa, pero suena coherente). El 
 % resto son los parámetros en el orden en que aparecen en fcn.
 % Si no se especifican errores, devuelve el parámetro "error" vacío.
+% Al especificar los errores, puede agregarse opcionalmente una función
+% que represente la derivada analítica de fcn. Si no se proporciona, se
+% calcula numéricamente (ojo con eso).
 % Similarmente, si quieren los errores tienen que llamar a la función
 % asignando de la forma
   % >> [parametros, errores] = fit(...)
   
-% OJO: La función fcn debe poder tomar un vector de x como parámetro.
+% OJO: La función fcn (y dfcn)debe poder tomar un vector de x como parámetro.
 % Esto en general no es un problema si están usando funciones básicas
 % de Octave, ya que los operadores y funciones suelen estar sobrecargados
 % y, en el caso de matrices, se aplican elemento a elemento.
@@ -98,12 +106,22 @@ endfunction
 % promedio es justamente 0.5 (y no hay que olvidar que estaba dividido
 % por 10), así que el resultado no es sorprendente.
 
-
+% Si además quisieramos los errores, deberiamos tener un par de vectores
+% Ex y Ey que representen los errores en X e Y respectivamente. Entonces
+% definimos otra funcion
+  % >> DerivExpRara = @(X,A) A(1)*A(2)*exp(A(2)*X)
+% donde tenemos la derivada analítica de ExpRara respecto de X. Entonces 
+% llamamos a fit como 
+  % >> [Param, Err] = fit(ExpRara,X,Y,[1,1,1],Ex,Ey,DerivExpRara)
+% Y obtenemos como resultado los mismos parámetros de antes en Param y 
+% una variable más Err con los errores de estos parámetros.
 
 
 
 function res = linfit(X,Ex,Y,Ey)
-  assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
+  assert(length(X)==length(Y))
+  assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
+  assert(length(Ex)==length(X))
   T = yes_or_no("Graficar?: ");
   N = length(X);
   res = zeros(1,5);

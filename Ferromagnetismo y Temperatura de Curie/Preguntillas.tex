@@ -72,7 +72,19 @@ Preguntas de Ferromagnetismo para el pelado botón
 	Los materiales magnéticamente duros son aquellos que, una vez magnetizados, conservan dicha magnetización de manera permanente, mientras que los blandos tienden a perderla fácilmente.
 	Los duros se pueden utilizar en motores eléctricos y generadores de corriente continua entre otros; y los blandos se pueden usar en transformadores, generadores, electroimanes etc.
 	\item \textbf{¿Cómo funciona un transformador, un transformador diferencial y un auto-transformador?¿Para qué se usa cada uno?}
-	\item \textbf{¿Cómo funciona un circuito integrador? Calcule la función de transferencia y la frecuencia de corte.}
+	\item \textbf{¿Cómo funciona un circuito integrador? Calcule la función de transferencia y la frecuencia de corte.} 
+	
+	Un circuito integrador es aquel que integra la señal de entrada y la devuelve a la salida. Se construye como un RC serie donde la señal de salida es la caída de potencial en el capacitor. 
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.75]{integrador.png}
+		\caption{Hola, soy un circuito pedorro}
+		\label{CH}
+	\end{figure}
+	
+	Para frecuencias mayores a la frecuencia de corte $f_c = 1/2\pi RC$ la función de transferencia resulta $T = 1/\omega RC$
+	
 	\item \textbf{¿Qué significa la integral de la curva de histéresis?}
 	
 	El área bajo la curva es proporcional a la energía perdida como calor durante la magnetización. 

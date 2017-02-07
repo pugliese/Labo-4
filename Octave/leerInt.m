@@ -57,7 +57,7 @@ else
     ModoDeCargado(3) = y_or_n("¿Redefinir titulos?");
   endif
 endif
-Data = csvread(fiiile, ModoDeCargado(2),0);
+Data = dlmread(fiiile," ", ModoDeCargado(2),0);
 if ModoDeCargado(1)
   NumeroDeColumnas=columns(Data);
   TitulosDeColumnas=textread(fiiile,"%s, ",NumeroDeColumnas);

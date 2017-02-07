@@ -10,6 +10,10 @@
 @<anonymous>
 @(T, A) A (1) * exp (-A (2) * T) + A (3)
 
+# name: ExpLin
+# type: function handle
+@<anonymous>
+@(T, A) A (1) * exp (-A (2) * T) + A (3)*T+A(4)
 
 # name: Lin
 # type: function handle

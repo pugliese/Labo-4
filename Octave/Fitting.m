@@ -1,7 +1,6 @@
 1;
 function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
-  assert(length(X)==length(Y))
-  assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
+  assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
 % error cuadrático (como la métrica de L2) entre los Y(i) y la función
@@ -12,7 +11,7 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   res = [res 0];
   A_ = inv(hess);
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
-  if Ex != 0 | Ey!=0
+  if Ex != 0 || Ey!=0
     if class(Ex)=="double" && length(Ex)==1
       Ex = ones(1,length(X))*Ex;
     endif
@@ -126,8 +125,7 @@ endfunction
 
 
 function res = linfit(X,Ex,Y,Ey)
-  assert(length(X)==length(Y))
-  assert(length(Ex)==length(Ey)) % Chequeo que las longitudes coincidan
+  assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   if class(Ex)=="double" && length(Ex)==1
     Ex = ones(1,length(X))*Ex;
   endif

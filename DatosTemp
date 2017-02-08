@@ -1,0 +1,22 @@
+# Created by Octave 4.2.0, Wed Feb 08 15:20:20 2017 GMT <unknown@unknown>
+# name: CapCal
+# type: matrix
+# rows: 1
+# columns: 2
+ 3098942.264644204 802952.26337202
+
+
+# name: EV
+# type: matrix
+# rows: 1
+# columns: 4
+ 67.9910108936577 2178.377013205873 46.70054675180882 0.9998780094300217
+
+
+# name: EVE
+# type: matrix
+# rows: 1
+# columns: 3
+ 3.913292635189461 190.3872218161977 4.082330253659655
+
+

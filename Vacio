@@ -1,16 +1,16 @@
-# Created by Octave 4.2.0, Wed Feb 08 16:14:58 2017 GMT <unknown@unknown>
+# Created by Octave 4.2.0, Wed Feb 08 15:38:41 2017 GMT <unknown@unknown>
 # name: CA
 # type: matrix
 # rows: 1
-# columns: 4
- 40.43282472961152 442.3881005362629 0.9482473650819159 0.9951943052582251
+# columns: 3
+ 40.79364598050049 413.8239636524217 0.9946721611087987
 
 
 # name: CAE
 # type: matrix
 # rows: 1
-# columns: 3
- 0.4825220752651779 13.31660700579669 0.2560102449953922
+# columns: 2
+ 0.4841680457110204 9.821392202997904
 
 
 # name: EA
@@ -30,15 +30,15 @@
 # name: CV
 # type: matrix
 # rows: 1
-# columns: 4
- 174.9113953852315 1380.458752665399 2.321652918446103 0.9996347921690236
+# columns: 3
+ 172.6034123208156 1290.808008882575 0.9994210602066905
 
 
 # name: CVE
 # type: matrix
 # rows: 1
-# columns: 3
- 18.82315126093928 261.6889561627658 2.611748746142666
+# columns: 2
+ 16.9081581097286 202.463019392717
 
 
 # name: EV
@@ -58,7 +58,7 @@
 # name: tempC
 # type: function handle
 @<anonymous>
-@(x, A) A (1) * (1 - exp (-x / A (2))) + A (3)
+@(x, A) A (1) * (1 - exp (-x / A (2)))
 
 
 # name: dtempC
@@ -77,12 +77,5 @@
 # type: function handle
 @<anonymous>
 @(x, A) -A (1) * exp (-x / A (2)) / A (2)
-
-
-# name: CapCal
-# type: matrix
-# rows: 1
-# columns: 2
- 3249165.65041152 895607.3252255934
 
 

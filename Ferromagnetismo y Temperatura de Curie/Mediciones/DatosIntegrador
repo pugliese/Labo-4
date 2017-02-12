@@ -1,0 +1,21 @@
+# Created by Octave 4.2.0, Sun Feb 12 04:05:26 2017 GMT <unknown@27-42431130-3>
+# name: AjusteV
+# type: function handle
+@<anonymous>
+@(x, A) A (1) ./ sqrt (1 + (x / A (2)) .^ 2)
+
+
+# name: ParamV
+# type: matrix
+# rows: 1
+# columns: 3
+ 30.44219061135753 26.71054477684125 0.9930418699336733
+
+
+# name: ErrV
+# type: matrix
+# rows: 1
+# columns: 2
+ 0.3628836780734828 0.4074016664582841
+
+

@@ -56,7 +56,7 @@ Preguntas de Ferromagnetismo para el pelado botón
 		 Los materiales ferromagnéticos son aquellos que adquieren magnetización al ser expuestos a un campo magnético y la mantienen una vez que este es removido. Los paramagnéticos son los que adquieren magnetización al ser expuestos, pero la pierden inmediatamente cuando el campo desaparece, por lo que no tienen memoria. Finalmente, los diamagnéticos son aquellos que adquieren magnetización que tiende a oponerse al campo magnético al que están siendo expuestos, pero también la pierden al desaparecer el campo como un paramagnético.
 	\item \textbf{¿Qué es una curva de histéresis? Grafique e indique la magnetización remanente y la coercitividad.}
 	
-		La curva de histéresis muestra la magnetización de un material en función a la intensidad del campo magnético que la induce.
+		La curva de histéresis muestra la magnetización de un material en función a la intensidad del campo magnético que la induce. Cabe destacar que un mismo material puede tener varios ciclos de histéresis dependiendo del valor de la excitación máxima y mínimo que se aplique.
 
 \begin{figure}[h]
 	\centering
@@ -72,7 +72,24 @@ Preguntas de Ferromagnetismo para el pelado botón
 	
 	Los materiales magnéticamente duros son aquellos que, una vez magnetizados, conservan dicha magnetización de manera permanente, mientras que los blandos tienden a perderla fácilmente.
 	Los duros se pueden utilizar en motores eléctricos y generadores de corriente continua entre otros; y los blandos se pueden usar en transformadores, generadores, electroimanes etc.
+	
 	\item \textbf{¿Cómo funciona un transformador, un transformador diferencial y un auto-transformador?¿Para qué se usa cada uno?}
+	
+	\begin{figure}[h]
+		\centering
+		\includegraphics[scale=0.6]{Trans.png}
+		\includegraphics[scale=0.6]{TransDif.jpg}
+		\includegraphics[scale=0.45]{AutoTrans.jpg}
+		\caption{Transformador común, diferencial y autotransformador (de izquierda a derecha)}
+		\label{CH}
+	\end{figure}
+	
+	Un transformador consiste de dos bobinas acopladas alrededor de un nucleo ferromagnético que modifican la tensión de entrada de forma tal que $E_s N_s = \pm E_pN_p$, dependiendo del sentido relativo de los embobinados. Se usa justamente entre fuente y dispositivo para transformar la tensión de la fuente en la tensión a la que el dispositivo opera.
+	
+	Un transformador diferencial consiste de 2 bobinas secundarias, una bobina primaria y un núcleo móvil. La bobina primaria induce tensión en las secundarias, las cuales al estar invertidas proporcionan un $E_s$ igual a la resta de sus voltajes. Sin embargo, el núcleo puede moverse, modificando las inductancias y, así, la $E_s$. Dada la sensibilidad de $E_s$ ante movimientos del núcleo, suelen usarse para medir pequeños desplazamientos como en las balanzas electrónicas y otros instrumentos de medición electrónica.
+	
+	Por último, un autotransformador consiste de una única bobina alrededor de un nucleo ferromagnético con una terminal que sale a una cierta altura del mismo. La relación de voltajes es $V_H=\frac{N_1}{N_1+N_2}V_X$. Estos transformadores se utilizan para interconectar circuitos que funcionan a tensiones diferentes pero con relación aproximadamente 2:1 y para sistemas de distribución eléctrica a grandes distancias dado que con ellos la caída de tensión es menor.
+	
 	\item \textbf{¿Cómo funciona un circuito integrador? Calcule la función de transferencia y la frecuencia de corte.} 
 	
 	\begin{figure}[h]

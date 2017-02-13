@@ -1,0 +1,41 @@
+# Created by Octave 4.2.0, Thu Feb 09 11:42:22 2017 GMT <unknown@unknown>
+# name: Presion
+# type: function handle
+@<anonymous>
+@(x) 10 .^ ((x - 8.23) / .692)
+
+
+# name: Pasion
+# type: function handle
+@<anonymous>
+@(x, A) A (1) * exp (-x / A (2) + A (3) ./ (x + A (4))) + A (5)
+
+
+# name: AM
+# type: matrix
+# rows: 1
+# columns: 6
+ 12.01443766265082 0.5029077784035784 7139.241909837162 1819.628103583086 0.01600600110743573 0.9696190110112269
+
+
+# name: AMD
+# type: matrix
+# rows: 1
+# columns: 6
+ 10.27322762414142 0.69044390214633 10181.05657584678 2517.551212350513 0.04677965904034 0.9841950641508975
+
+
+# name: AMT
+# type: matrix
+# rows: 1
+# columns: 6
+ 0.06284877214912973 33.41023908881906 50.04065753530551 8.069516802662088 0.02342555936464175 0.9996039478215187
+
+
+# name: TIn
+# type: matrix
+# rows: 1
+# columns: 3
+ 95 145 160
+
+

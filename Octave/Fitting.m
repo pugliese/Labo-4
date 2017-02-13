@@ -37,7 +37,7 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
     B = 2*B;
     error = sqrt(([Ex Ey].^2)*((A_*B).^2)');
     if T
-      errorbar(X,Y,Ex,Ey,"~>o");
+      errorbar(X,Y,Ex,Ey,"~>.");
       hold on;
       plot(X,fcn(X,res(1:k)),"r");
       hold off;
@@ -45,7 +45,7 @@ function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
   else
     error = zeros(1,k);
     if T
-      plot(X,Y,"o");
+      plot(X,Y,".");
       hold on;
       plot(X,fcn(X,res(1:length(res)-1)),"r");
       hold off;

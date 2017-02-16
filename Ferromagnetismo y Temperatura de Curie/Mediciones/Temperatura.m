@@ -14,13 +14,12 @@ function res = Temp(V)  % Transforma el voltaje en temperatura
       if i>rows(Tabla)        % Nos pasamos de rango y el valor no está en la tabla
         disp("Voltaje fuera de rango")
       else
-        while j<columns(Tabla) && not(Tabla(i,j)<=1000*V(k) && 1000*V(k)<=Tabla(i,j+1) || (Tabla(i,j)>=1000*V(k) && 1000*V(k)>=Tabla(i,j+1)))
+        while j<columns(Tabla) && not(Tabla(i,j)<=1000*V(k) && 1000*V(k)<=Tabla(i,j+1) || (Tabla(i,j)>=1000*V(k) && 1000*V(k)>=Tabla(i,j+1)));
           j++;                   % Ahora busco la columna y encuentro la posición                           
         endwhile
-        if j<columns(Tabla) && abs(Tabla(i,j+1)-1000*V(k))<abs(1000*V(k)-Tabla(i,j))
+        if j<columns(Tabla) && abs(Tabla(i,j+1)-1000*V(k))<abs(1000*V(k)-Tabla(i,j));
           j++;        % Elijo el valor más cercano
         endif
-        i,j
         if i<20
           res(k) = 10*(i-20)-(j-2);
         else

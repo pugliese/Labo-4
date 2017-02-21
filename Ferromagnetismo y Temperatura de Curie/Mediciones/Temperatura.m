@@ -1,31 +1,32 @@
 1;
+
+global Tabla
+Tabla = dlmread("TempVsRes.txt", " ");
+Tabla = vec(Tabla(:,2:columns(Tabla)));   % Transformo la tabla en un vector
+Tabla = sort(Tabla);    % Ordeno aprovechando que R(T) es creciente
+Tabla = [Tabla(1:200); Tabla(202:length(Tabla))];  % Saco el 100 que está 2 veces
+
 function res = Temp(V)  % Transforma el voltaje en temperatura
-  Tabla = dlmread("TempVsRes.txt", " ");
-  res = zeros(1,length(V))-1;
-  for k=1:length(V)
-    i=1;
-    if V(k)==0.1
-      res(k) = 0;
+  global Tabla          % V tiene que ser un vector creciente
+  assert(1000*V<=Tabla(length(Tabla)) && 1000*V>=Tabla(1))
+  res = 0*V;
+  it = res;
+  i = 1;
+  s = length(Tabla);
+  while i+1<s       % BUSQUEDA BINARIAA (solo es importante en la primer iteracion)
+    m = floor((s+i)/2);
+    if Tabla(m)<V(1)*1000   % Busco hasta ensanguchar al valor entre 
+      i = m;                % dos elementos para interpolar
     else
-      while i<rows(Tabla) && not(Tabla(i,2)<1000*V(k) && 1000*V(k)<Tabla(i+1,2))   % La resistencia es V/1mA
-        i++;                                              % y busco ensangucharla para 
-      endwhile                                            % ubicar la fila
-      j=2;
-      if i>rows(Tabla)        % Nos pasamos de rango y el valor no está en la tabla
-        disp("Voltaje fuera de rango")
-      else
-        while j<columns(Tabla) && not(Tabla(i,j)<=1000*V(k) && 1000*V(k)<=Tabla(i,j+1) || (Tabla(i,j)>=1000*V(k) && 1000*V(k)>=Tabla(i,j+1)));
-          j++;                   % Ahora busco la columna y encuentro la posición                           
-        endwhile
-        if j<columns(Tabla) && abs(Tabla(i,j+1)-1000*V(k))<abs(1000*V(k)-Tabla(i,j));
-          j++;        % Elijo el valor más cercano
-        endif
-        if i<20
-          res(k) = 10*(i-20)-(j-2);
-        else
-          res(k) = 10*(i-21)+(j-2);
-        endif
-      endif
+      s = m;
     endif
+  endwhile
+  for k=1:length(V)
+    while 1000*V(k)>Tabla(s)
+      s++;
+    endwhile
+    res(k) = s-201+(1000*V(k)-Tabla(s-1))/(Tabla(s)-Tabla(s-1)); % Interpolo
   endfor
 endfunction
+
+    

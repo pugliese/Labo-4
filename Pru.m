@@ -33,7 +33,7 @@ ymin=min(Vsal(1:1000))*1.2;
 T=Temp(data(:,3));
 
 #Esta parte va a hacer el grafico de magnetizacion remanente
-MrGraf(T,Vent,Vsal,0.001);
+MrGraf2(T,Vent,Vsal,0.001);
 saveas(gcf,strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\MagRem-',sprintf(x(k,:)),'.jpg'));
 #Guarda el grafico
 

@@ -24,18 +24,19 @@ mkdir(strcat('medicion-',sprintf(x(k,:))));
 #defino variables de forma q los otros programas las puedan usar
 t=time';
 h=length(t);
-#Vent=smoothG(t,data(:,1)',0.001,25)(:,2)
-#Vsal=smoothG(t,(data(:,2)-mean(data(:,2)))',0.001,100)(:,2);
+[a,Vent]=smoothG(t,DesOffSet(data(:,1)'),0.001,25);
+clear a;
+Vsal=DesOffSet(data(:,2))';
+[a,b]=smoothG(t,data(:,3)',0.001,100);
+clear a;
+T=Temp(b);
 
-#T=Temp(smooth(t,data(:,3)',0.001,100)(:,2));
-
-#si el archivo tiene los datos del voltaje que entra al integrador, los centra, los smoothea, y los integra
-if length data(1,:)=4
-  Vint1=smoothG(t,(data(:,4)-mean(data(:,4)))',0.001,100)(:,2);
-  Vint2=IntegrarC(t,Vint1);
+#si el archivo tiene los datos del voltaje que entra al integrador, los centra y los integra.
+K=length(data(1,:))
+if K = 4
+  Vint1=DesOffSet(data(:,4)');
+  Vint=Vill(t,Vint1);
   clear Vint1;
-  Vint=[Vint2(1),Vint2,Vint2(length(Vint2))];
-  clear Vint2;
 else
   Vint=0
 endif
@@ -47,7 +48,6 @@ xmax=max(Vent(1:1000))*1.2;
 xmin=min(Vent(1:1000))*1.2;
 ymax=max(Vsal(1:1000))*1.2;
 ymin=min(Vsal(1:1000))*1.2;
-
 
 
 #esta parte grafica

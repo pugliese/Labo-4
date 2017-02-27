@@ -1,40 +1,68 @@
 function Prueba=Pru(x)
 l=length(x(:,1));
 
+#aca abre los programas q va a usar q estan aparte
+open smoothing.m;
+open temperatura.m;
+open Fitting.m;
+open Integrar.m;
+
+#aca los ejecuta para q no tire error (es que es medio tontito octave)
+smoothing;
+Temperatura;
+Fitting;
+Integrar;
+
 for k=1:l
 load(sprintf(x(k,:)));
 
 #esto crea una carpeta en la cual va a guardar todos los datos del ciclo k
-mkdir('C:\Users\Gonzalo\Desktop\pruebas',strcat('medicion-',sprintf(x(k,:)))); 
-#ata k
+#(parent,dir) crea la carpeta "dir" en la carpeta "parent" 
+#si no pones parent, la crea en la carpeta en la carpeta actual
+mkdir(strcat('medicion-',sprintf(x(k,:)))); 
 
-t=time;
-Vent=data(:,1);
-Vsal=data(:,2)-mean(data(:,2));
+#defino variables de forma q los otros programas las puedan usar
+t=time';
+h=length(t);
+#Vent=smoothG(t,data(:,1)',0.001,25)(:,2)
+#Vsal=smoothG(t,(data(:,2)-mean(data(:,2)))',0.001,100)(:,2);
 
-#me fijo en los primeros mil puntos del vector y asumo q no crese despues mas de un 20% para establecer
+#T=Temp(smooth(t,data(:,3)',0.001,100)(:,2));
+
+#si el archivo tiene los datos del voltaje que entra al integrador, los centra, los smoothea, y los integra
+if length data(1,:)=4
+  Vint1=smoothG(t,(data(:,4)-mean(data(:,4)))',0.001,100)(:,2);
+  Vint2=IntegrarC(t,Vint1);
+  clear Vint1;
+  Vint=[Vint2(1),Vint2,Vint2(length(Vint2))];
+  clear Vint2;
+else
+  Vint=0
+endif
+clear data
+
+#me fijo en los primeros mil puntos del vector y asumo q no crece despues mas de un 20% para establecer
 #los limites que van a tener los graficos de histeresis
 xmax=max(Vent(1:1000))*1.2;
 xmin=min(Vent(1:1000))*1.2;
 ymax=max(Vsal(1:1000))*1.2;
 ymin=min(Vsal(1:1000))*1.2;
 
+
+
 #esta parte grafica
    for i=1:18
-    X=Vent((i-1)*10*7557+1:(i-1)*10*7557+3779);
-    Y=Vsal((i-1)*10*7557+1:(i-1)*10*7557+3779);
+    X=Vent((i-1)*10*floor(h/180)+1:(i-1)*10*floor(h/180)+floor(h/360)+1);
+    Y=Vsal((i-1)*10*floor(h/180)+1:(i-1)*10*floor(h/180)+floor(h/360)+1);
     I=plot(X,Y);
     xlimits = xlim([xmin,xmax]);
     ylimits = ylim([ymin,ymax]);
-    saveas(gcf,strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\',sprintf(x(k,:)),'-Figure',num2str(i),'.jpg'))
+    legend(strcat('Temperatura entre ', T((i-1)*10*floor(h/180)+1),'°C y ',T((i-1)*10*floor(h/180)+floor(h/360)+1),'°C'));
+    saveas(gcf,strcat('medicion-',sprintf(x(k,:)),'\',sprintf(x(k,:)),'-Figure',num2str(i),'.jpg'))
   endfor
 clear X
 clear Y
-#hasta aca
 
-T=Temp(data(:,3));
-
-clear data
 
 #esto va a fijarse en el nombre del archivo cual es la frecuencia tomando los primeros numeros que aparecen
 f=str2num(strtrunc(sprintf(x(k,:)),findstr(sprintf(x(k,:)),"H")-1));
@@ -46,11 +74,11 @@ f=str2num(strtrunc(sprintf(x(k,:)),findstr(sprintf(x(k,:)),"H")-1));
 
 #Esta parte va a hacer el grafico de magnetizacion remanente
 MrGraf2(T,Vent,Vsal,f);
-saveas(gcf,strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\MagRem-',sprintf(x(k,:)),'.jpg'));
+saveas(gcf,strcat('medicion-',sprintf(x(k,:)),'\MagRem-',sprintf(x(k,:)),'.jpg'));
 #Guarda el grafico
 
 
-save ((strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\datos-',sprintf(x(k,:)))),"t","Vent","Vsal","T");
+save ((strcat('medicion-',sprintf(x(k,:)),'\datos-',sprintf(x(k,:)))),"t","Vent","Vsal","T");
 #Guarda las variables
 
 clear t
@@ -108,8 +136,7 @@ MdT=@(x,A) A(1)*((A(2)-x).^(A(3)))+ A(4);
 
 fit(MdT,TrA,MrA,[1,-17,0.4,os]);
 
-
-saveas(gcf,strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\Ajuste-',sprintf(x(k,:)),'.jpg'));
+saveas(gcf,strcat('medicion-',sprintf(x(k,:)),'\Ajuste-',sprintf(x(k,:)),'.jpg'));
 #save ((strcat('C:\Users\Gonzalo\Desktop\pruebas\medicion-',sprintf(x(k,:)),'\Ajuste-',sprintf(x(k,:)))),"A");
 
 clear Mr0

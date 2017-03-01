@@ -15,7 +15,15 @@ function [Mr,Tr]=MrGraf2(t,H,M,f);
         sup = mid;
       endif
     endwhile
-    if abs(H(inf))>abs(H(sup))   % Me fijo cual de los 2 está más cerca del 0
+    if inf==sup && H(sup)>0
+      disp("Dieron igual")
+      inf--;
+    else if inf==sup && H(sup)<=0
+      disp("Dieron igual")
+      sup++;
+    endif
+    endif
+    if abs(H(inf))>abs(H(sup))   % Me fijo cual de los 2 estï¿½ mï¿½s cerca del 0
       Mr(j) = M(sup)-(M(sup)-M(inf))*H(sup)/(H(sup)-H(inf));
       Tr(j) = t(sup)-(t(sup)-t(inf))*H(sup)/(H(sup)-H(inf));
     else                         % Interpolo con todo el flow

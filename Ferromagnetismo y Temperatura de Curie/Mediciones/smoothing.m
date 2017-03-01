@@ -39,8 +39,8 @@ function [Xs,Ys] = smoothG(X,Y,s,n=0)    % Gaussian Smoothing
     endif
   else % Los n positivos implican que no se filtre ningún punto
     for i=1:N
-      Gx = exp(-.5*((X(max(0,i-floor(n/2)):min(N,i+ceil(n/2)))-Xs(i))/s).^2);
-      Ys(i) = Gx*Y(max(0,i-floor(n/2)):min(N,i+ceil(n/2)))'/sum(Gx);   
+      Gx = exp(-.5*((X(max(1,i-floor(n/2)):min(N,i+ceil(n/2)))-X(i))/s).^2);
+      Ys(i) = Gx*Y(max(1,i-floor(n/2)):min(N,i+ceil(n/2)))'/sum(Gx);   
       % Peso de cada punto dependiendo de su distancia
     endfor
     Xs = X;

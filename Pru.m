@@ -1,9 +1,6 @@
 function Prueba=Pru(x)
 l=length(x(:,1));
 
-for k=1:l
-load(sprintf(x(k,:)));
-
 #aca abre los programas q va a usar q estan aparte
 open smoothing.m;
 open temperatura.m;
@@ -16,6 +13,11 @@ Temperatura;
 Fitting;
 Integrar;
 
+for k=1:l
+load(sprintf(x(k,:)));
+#esto va a fijarse en el nombre del archivo cual es la frecuencia tomando los primeros numeros que aparecen
+f=str2num(strtrunc(sprintf(x(k,:)),findstr(sprintf(x(k,:)),"H")-1));
+
 #esto crea una carpeta en la cual va a guardar todos los datos del ciclo k
 #(parent,dir) crea la carpeta "dir" en la carpeta "parent" 
 #si no pones parent, la crea en la carpeta en la carpeta actual
@@ -24,20 +26,20 @@ mkdir(strcat('medicion-',sprintf(x(k,:))));
 #defino variables de forma q los otros programas las puedan usar
 t=time';
 h=length(t);
-[a,b]=smoothG(t,DesOffSet(data(:,1)'),0.001,25);
+[a,b]=smoothG(t,DesOffSet2(data(:,1)',f),0.001,25);
 H=(400/(5*8)).*b;
 clear a;
 clear b;
-Bint=(1/(4*pi*4*1600)).*(1/(16.2*26.7)).*DesOffSet(data(:,2))';
+Bint=(1/(4*pi*4*1600)).*(1/(16.2*26.7)).*DesOffSet2(data(:,2)',f);
 [a,b]=smoothG(t,data(:,3)',0.001,100);
 clear a;
 T=Temp(b);
 
 #si el archivo tiene los datos del voltaje que entra al integrador, los centra y los integra.
 K=length(data(1,:))
-if K = 4
-  Vint1=DesOffSet(data(:,4)');
-  Bnum=(-1/(4*pi*4*1600)).*Vill(t,Vint1);
+if K == 4;
+  Vint1=DesOffSet2(data(:,4)',f);
+  Bnum=(-1/(4*pi*4*1600)).*Vill2(t,Vint1,f);
   clear Vint1;
 else
   Vint=0
@@ -53,7 +55,7 @@ ymin=min(Bint(1:1000))*1.2;
 
 
 #esta parte grafica
-if K=4
+if K==4
    for i=1:18
     X=H((i-1)*10*floor(h/180)+1:(i-1)*10*floor(h/180)+floor(h/360)+1);
     Y1=Bint((i-1)*10*floor(h/180)+1:(i-1)*10*floor(h/180)+floor(h/360)+1);
@@ -82,8 +84,6 @@ clear X
 clear Y1
 clear Y2
 
-#esto va a fijarse en el nombre del archivo cual es la frecuencia tomando los primeros numeros que aparecen
-f=str2num(strtrunc(sprintf(x(k,:)),findstr(sprintf(x(k,:)),"H")-1));
 
 # findstr(s,t) te dice en que lugares del string s esta t (un string lo toma como un vector)
 # strtrunc(s,n) te devuelve un string que tiene las primeras n simbolos del string s
@@ -97,6 +97,7 @@ load MagRemVar
 save ((strcat('medicion-',sprintf(x(k,:)),'\MagRemVarInt-',sprintf(x(k,:)))),"Mr","Tr")
 clear Tr
 clear Mr
+close all
 
 MrGraf2(T,H,Bnum,f);
 saveas(gcf,strcat('medicion-',sprintf(x(k,:)),'\MagRemNum-',sprintf(x(k,:)),'.jpg'));
@@ -104,6 +105,7 @@ load MagRemVar
 save ((strcat('medicion-',sprintf(x(k,:)),'\MagRemVarNum-',sprintf(x(k,:)))),"Mr","Tr")
 clear Tr
 clear Mr
+close all
 #Guarda los graficos y los datos
 #separados entre los q vienen de la integracion por circuito y la integracion numerica
 
@@ -149,9 +151,9 @@ while Tr(n)<-25
   endif
 endwhile
 [a,MrAs]=smoothG(TrA,MrA,0.1,10);
-TrA=TrA'
-MrA=MrA'
-MrAs=MrAs'
+TrA=TrA';
+MrA=MrA';
+MrAs=MrAs';
 save ((strcat('medicion-',sprintf(x(k,:)),'\MagRemVarIntPos-',sprintf(x(k,:)))),"TrA","MrA","MrAs");
 
 clear a
@@ -188,12 +190,18 @@ while Tr(n)<-25
   endif
 endwhile
 [a,MrAs]=smoothG(TrA,MrA,0.1,10);
-TrA=TrA'
-MrA=MrA'
-MrAs=MrAs'
+TrA=TrA';
+MrA=MrA';
+MrAs=MrAs';
 save ((strcat('medicion-',sprintf(x(k,:)),'\MagRemVarNumPos-',sprintf(x(k,:)))),"TrA","MrA","MrAs");
 
-clear all
+clear a
+clear MrA
+clear MrAs
+clear Tr
+clear Mr
+clear TrA
+
 endfor
 endfunction
 

@@ -1,13 +1,24 @@
 1;
-function [res,error] = fit(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
+function [res,error] = fit(fcn,X,Y,A0,B=[],g=[],h=[],Ex=0,Ey=0,dfcn=0)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
-  f = @(A) sum((Y-fcn(X,A)).^2); % Defino la función que devuelve el
-% error cuadrático (como la métrica de L2) entre los Y(i) y la función
-% para un dado conjunto de parámetros A
+  f = @(A) sum((Y-fcn(X,A)).^2); % Defino la funciï¿½n que devuelve el
+% error cuadrï¿½tico (como la mï¿½trica de L2) entre los Y(i) y la funciï¿½n
+% para un dado conjunto de parï¿½metros A
   k = length(A0);
   N = length(X);
-  [res,dist,inf,out,grad,hess]= fminunc(f,A0); % Busco el conjunto A que minimiza el error
+  grad=[];hess=[];
+  if length(class(g))!=length("function_handle") && length(class(h))!=length("function_handle") && (columns(B)==0 || rows(B)==0)
+    [res,dist,inf,out,grad,hess]= fminunc(f,A0); % Busco el conjunto A que minimiza el error
+  else
+    if (columns(B)==0 || rows(B)==0)
+      res = sqp(A0',f,h,g)';
+    else
+      res = sqp(A0',f,h,g,B(1,:),B(2,:))';
+    endif
+    grad = gradiente(f,res);
+    hess = hessiano(f,res);
+  endif
   res = [res 0];
   A_ = inv(hess);
   res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
@@ -58,19 +69,19 @@ endfunction
 % Aca A0 es un vector inicial de donde empieza a buscar.
 % Aun no pude incluir los errores de X e Y, asi que los parametros
 % se devuelven sin error.
-% El último elemento del resultado (res) será el R-square del ajuste 
+% El ï¿½ltimo elemento del resultado (res) serï¿½ el R-square del ajuste 
 % (la forma en que lo calculo es dudosa, pero suena coherente). El 
-% resto son los parámetros en el orden en que aparecen en fcn.
-% Si no se especifican errores, devuelve el parámetro "error" vacío.
-% Al especificar los errores, puede agregarse opcionalmente una función
-% que represente la derivada analítica de fcn. Si no se proporciona, se
-% calcula numéricamente (ojo con eso).
-% Similarmente, si quieren los errores tienen que llamar a la función
+% resto son los parï¿½metros en el orden en que aparecen en fcn.
+% Si no se especifican errores, devuelve el parï¿½metro "error" vacï¿½o.
+% Al especificar los errores, puede agregarse opcionalmente una funciï¿½n
+% que represente la derivada analï¿½tica de fcn. Si no se proporciona, se
+% calcula numï¿½ricamente (ojo con eso).
+% Similarmente, si quieren los errores tienen que llamar a la funciï¿½n
 % asignando de la forma
   % >> [parametros, errores] = fit(...)
   
-% OJO: La función fcn (y dfcn)debe poder tomar un vector de x como parámetro.
-% Esto en general no es un problema si están usando funciones básicas
+% OJO: La funciï¿½n fcn (y dfcn)debe poder tomar un vector de x como parï¿½metro.
+% Esto en general no es un problema si estï¿½n usando funciones bï¿½sicas
 % de Octave, ya que los operadores y funciones suelen estar sobrecargados
 % y, en el caso de matrices, se aplican elemento a elemento.
 % Por ejemplo, sin([1,2,3]) = [sin(1),sin(2),sin(3)].
@@ -79,49 +90,96 @@ endfunction
 %%%%%% UN EJEMPLO %%%%%%%
 % Imaginense que tienen una serie de puntos (X,Y) y quieren fittear con
 % una exponencial, osea algo de la forma f(x) = a*exp(b*x)+c. Entonces 
-% comienzan definiendo esa función ya sea de la forma clásica o usando
-% funciones anónimas/in-line (que es lo que voy a hacer a continuación).
+% comienzan definiendo esa funciï¿½n ya sea de la forma clï¿½sica o usando
+% funciones anï¿½nimas/in-line (que es lo que voy a hacer a continuaciï¿½n).
   % >> ExpRara = @(X,A) A(1)*exp(A(2)*X)+A(3)
-% Acá tenemos una función manipulable donde matcheamos los parámetros
-% según A = [a,b,c]. Como dije en OJO, es importante Octave pueda hacer 
+% Acï¿½ tenemos una funciï¿½n manipulable donde matcheamos los parï¿½metros
+% segï¿½n A = [a,b,c]. Como dije en OJO, es importante Octave pueda hacer 
 % 'exp' de una matriz (elemento a elemento). 
-% Ahora, simplemente elegimos un vector se parámetros inicial. Si tenemos
+% Ahora, simplemente elegimos un vector se parï¿½metros inicial. Si tenemos
 % buen ojo, podemos ahorrarle unas cuantas cuentas a Octave, pero en
-% general no debería ser necesario.
+% general no deberï¿½a ser necesario.
   % >> fit(ExpRara,X,Y,[1,1,1])
 
 %%% WE NEED TO GO DEEPER %%%
-% Para hacer un ejemplo más real, tomemos
+% Para hacer un ejemplo mï¿½s real, tomemos
 
   % >> X = 0:0.1:10;
   % >> Y = 2*exp(X/2)+rand(1,length(X))/10;
   
-% Acá rand devuelve un vector de valores aleatorios entre 0 y 1, como
-% para darle "variación" a los resultados. Ahora fiteamos
+% Acï¿½ rand devuelve un vector de valores aleatorios entre 0 y 1, como
+% para darle "variaciï¿½n" a los resultados. Ahora fiteamos
 
   % >> fit(ExpRara,X,Y,[1,1,1])
   % ans =
 
   %    1.999155   0.500038   0.057407   1.000000
   
-% Así que podríamos decir que le pegó bastante bien, excepto en la
-% ordenada, donde le iba a pifiar porque justo ahí estaba el rand.
-% Aún así, dado que era un randoms de valores entre 0 y 1, su valor
+% Asï¿½ que podrï¿½amos decir que le pegï¿½ bastante bien, excepto en la
+% ordenada, donde le iba a pifiar porque justo ahï¿½ estaba el rand.
+% Aï¿½n asï¿½, dado que era un randoms de valores entre 0 y 1, su valor
 % promedio es justamente 0.5 (y no hay que olvidar que estaba dividido
-% por 10), así que el resultado no es sorprendente.
+% por 10), asï¿½ que el resultado no es sorprendente.
 
-% Si además quisieramos los errores, deberiamos tener un par de vectores
+%%%% ACTUALIZACION: Errores en los parÃ¡metros
+% Si ademï¿½s quisieramos los errores, deberiamos tener un par de vectores
 % Ex y Ey que representen los errores en X e Y respectivamente. Entonces
 % definimos otra funcion
   % >> DerivExpRara = @(X,A) A(1)*A(2)*exp(A(2)*X)
-% donde tenemos la derivada analítica de ExpRara respecto de X. Entonces 
+% donde tenemos la derivada analï¿½tica de ExpRara respecto de X. Entonces 
 % llamamos a fit como 
   % >> [Param, Err] = fit(ExpRara,X,Y,[1,1,1],Ex,Ey,DerivExpRara)
-% Y obtenemos como resultado los mismos parámetros de antes en Param y 
-% una variable más Err con los errores de estos parámetros.
-% Si los errores son constantes, basta con ponerlo como un número y el
+% Y obtenemos como resultado los mismos parï¿½metros de antes en Param y 
+% una variable mï¿½s Err con los errores de estos parï¿½metros.
+% Si los errores son constantes, basta con ponerlo como un nï¿½mero y el
 % programa se encarga de hacerlo vector.
+%%% WARNING: En la actualizaciÃ³n siguiente el orden de los parÃ¡metros cambia asÃ­
+%%% que el ejemplo estÃ¡ desactualizado... enchufenle tres parÃ¡metros "[]" en el
+%%% medio y ya fue.
 
+
+
+%%% ACTUALIZACION: Ajuste con restricciones
+% Lo que el pueblo pedÃ­a: Â¡Restricciones! Â¡Ahora su funciÃ³n favorita acepta
+% restricciones en sus parametros! Â¡Llame YA al 0800-434-Aguante-Zanella y pidala!
+% Si es de los primeros 3 compradores, se lleva un tutorial (de mierda) de regalo.
+
+% Bueno, ahora la funciÃ³n fit toma 3 parÃ¡metros extra h, g y B que representan los
+% vectores (columna) de igualdades y desigualdades respectivamente Â¿Que significa esto?
+% Matematicamente, g(x) = [g1(x);..;gn(x)], h(x) = [h1(x);..;hm(x)] y B = [lb;ub]
+% con lb y ub vectores (B es una matriz de 2xN con N=CantidadParametros) imponen al
+% programa las condiciones  g(x)>=0 (gi(x)>=0 para 1<=i<=n)
+%                           h(x)=0 (hi(x)=0 para 1<=i<=m)
+%                       lb<=x<=ub  (lb(i)<=x(i)<=ub(i) para 1<=i<=N)
+
+% Pueden ver que las condiciones claramente pueden ser MOOOY complejas, pero hay
+% una limitaciÃ³n. Es bastante paja, pero los gradientes de gi deben ser LI entre si
+% y lo mismo con los gradientes de hi. Eso a primera vista parece limitante, pero no para las
+% h, esas son igualdades y ya, si tienen el mismo gradiente es porque son dos condiciones
+% incompatibles (f(x) = c1 y f(x)=c2) o son la misma, en cuyo caso sos un mamerto.
+
+% El paja es B porque si ponÃ©s una sola condiciÃ³n tenÃ©s que completar el resto.
+% Si el ajuste tiene parametros A=[A(1),A(2),A(3),A(4)] y tu condiciÃ³n es A(2)<3
+% el B se escribirÃ­a B = [-Inf, -Inf, -Inf, -Inf; Inf, 3, Inf, Inf, Inf] Que paja, Â¿no?
+% OBS: Sip, Octave tiene un infinito y es de orden Inf~2^1024~8E308
+% Por lo tanto, si tienen que poner una condiciÃ³n, es recomendable que intenten poner
+% mÃ¡s asÃ­ aprovechan y le agregan velocidad (y capaz precisiÃ³n) al programa.
+
+%%% OJO1: Recuerden que g y h toman vectores y devuelven vectores (columna), por
+%%% ejemplo g = @(x) [x(1)-0.5;x(2)-x(1)] es la condiciÃ³n x(1)>=0.5 y x(1)<=x(2)
+%%% OJO2: En general, las funciones gi y hi deberÃ­an al menos tener derivada segunda, 
+%%% pero lo ideal es que fueran C2, asÃ­ que funciones como abs no son bienvenidas.
+%%% OJO3: Fijense que el orden de los parÃ¡metros cambiÃ³, ahora van las restricciones
+%%% antes que los errores por cuestiones de uso. Sip, ahora para hacer un ajuste 
+%%% normal con error hay que poner fit(fcn,X,Y,A0,[],[],[],Ex,Ey,dfcn)
+%%% Pero, Â¡Hey! Â¡Â¡dfcn sigue siendo opcional!! Abajo dejo una solucion para los
+%%% pajeros. Terrible, Â¿no?
+
+function [res,error] = fitSR(fcn,X,Y,A0,Ex=0,Ey=0,dfcn=0)
+  [res,error] = fit(fcn,X,Y,A0,[],[],[],Ex,Ey,dfcn); % Soy una amenaza
+endfunction
+
+% DISCLAIMER: Se ahorran los "[]" pero tienen que agregar el "SR", piensenlo...
 
 
 function res = linfit(X,Ex,Y,Ey)
@@ -136,7 +194,7 @@ function res = linfit(X,Ex,Y,Ey)
   N = length(X);
   res = zeros(1,5);
   x = sum(X)/N; % Calculo los promedios, lo cual no tiene ninguna
-  y = sum(Y)/N; % interpretación, solo facilita las cuentas y 
+  y = sum(Y)/N; % interpretaciï¿½n, solo facilita las cuentas y 
   aux1 = sum((X-x).*X);  % comprime sumas
   res(1) = sum((Y-y).*X)/aux1;
   res(3) = y-res(1)*x;
@@ -156,8 +214,6 @@ function res = linfit(X,Ex,Y,Ey)
 endfunction
 % Hace un ajuste lineal de (X,Y) con m*x+b devolviendo, en orden:
 %     m, delta m, b, delta b, R-square
-% En un futuro cercano le agregaré la funcionalidad de que también
-% lo grafique y capaz una forma más linda de expresar los resultados.
 
 
 function res = IntConf(X,p=.95)
@@ -170,16 +226,24 @@ endfunction
 % No hay mucho que decir, el formato es 
 %  promedio, error
 
+function res = gradiente(f,x,h=max(x,1)*1E-6)
+  N = length(x);
+  res = zeros(1,N);
+  for i=1:N
+    res(i) = (f([x(1:i-1) x(i)+h(i) x(i+1:N)])-f([x(1:i-1) x(i)-h(i) x(i+1:N)]))/(2*h(i));
+  endfor
+endfunction
 
-
-
-
-
-
+function res=hessiano(f,x,h=max(x,1)*1E-6)
+  N = length(x);
+  res = zeros(N);
+  for i=1:N
+    res(i,:) = (gradiente(f,[x(1:i-1) x(i)+h(i) x(i+1:N)],h)-gradiente(f,[x(1:i-1) x(i)-h(i) x(i+1:N)],h))/(2*h(i));
+  endfor
+endfunction
 
 
 %%% FUNCIONES AUXILIARES (por ahora al pedo) %%%%
-
 
 function res = dp(f,i=1,a=1E-6)
   res = @(Ao) (f(Ao+inc(Ao,i,a))-f(Ao-inc(Ao,i,a)))/(2*a);

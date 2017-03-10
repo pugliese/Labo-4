@@ -25,7 +25,7 @@ if ~exist('mux')
     fopen(mux)
 end
 ScanInterval = 1;% ? Delay (in secs) between scans
-numberScans = 3;% ? Number of scan sweeps to measure 
+numberScans = 1000;% ? Number of scan sweeps to measure 
 channelDelay = 0.2;% ? Delay (in secs) between relay closure and measurement
 scanList= '(@102,103,104,105)';%List of channels to scan in each scan
 
@@ -104,18 +104,7 @@ time2 = TIME(2:4:end);
 time3 = TIME(3:4:end);
 time4 = TIME(4:4:end);
 
-if ~all(CHAN(1:4:end)==102)
-    warning('Uhm, hay algo raro')
-end
-if ~all(CHAN(2:4:end)==103)
-    warning('Uhm, hay algo raro')
-end
-if ~all(CHAN(3:4:end)==104)
-    warning('Uhm, hay algo raro')
-end
-if ~all(CHAN(4:4:end)==105)
-    warning('Uhm, hay algo raro')
-end
+
 
 plot(time1, data1, time2, data2, time3, data3, time4, data4)
 xlabel('Tiempo')
@@ -124,4 +113,4 @@ legend('data1','data2','data3','data4')
 str=query(mux,'DATA:REMOVE? 10');
 %close connection
 %close(mux)
-dlmwrite('hielo_4canales_5.txt',[time1 data1 time2 data2 time3 data3 time4 data4], '\t');
+%dlmwrite('hielo_4canales_5.txt',[time1 data1 time2 data2 time3 data3 time4 data4], '\t');

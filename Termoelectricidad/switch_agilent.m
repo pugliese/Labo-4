@@ -25,7 +25,7 @@ if ~exist('mux')
     fopen(mux)
 end
 ScanInterval = 1;% ? Delay (in secs) between scans
-numberScans = 200;% ? Number of scan sweeps to measure 
+numberScans = 1000;% ? Number of scan sweeps to measure 
 channelDelay = 0.3;% ? Delay (in secs) between relay closure and measurement
 scanList= '(@102,103,104)';%List of channels to scan in each scan
 
@@ -120,4 +120,5 @@ str=query(mux,'DATA:REMOVE? 10');
 %close connection
 %close(mux)
 %dlmwrite('2A_subida_nueva2.txt',[time1 data1 time2 data2 time3 data3], '\t');
+save CondcTerm time1 data1 time2 data2 time3 data3
 

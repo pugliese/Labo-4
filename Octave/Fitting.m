@@ -2,9 +2,14 @@
 function [res,error] = fit(fcn,X,Y,A0,B=[],g=[],h=[],Ex=0,Ey=0,dfcn=0)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   T = yes_or_no("Graficar?: ");
-  f = @(A) sum((Y-fcn(X,A)).^2); % Defino la funci�n que devuelve el
+  if Ey==0
+      f = @(A) sum((Y-fcn(X,A)).^2); % Defino la funci�n que devuelve el
 % error cuadr�tico (como la m�trica de L2) entre los Y(i) y la funci�n
 % para un dado conjunto de par�metros A
+  else
+      f = @(A) sum(((Y-fcn(X,A))./Ey).^2); % Lo mismo, pero pesado por los errores
+% para tener el chi-square pesado.
+  endif
   if iscolumn(X)
     X = X';
   endif
@@ -14,20 +19,21 @@ function [res,error] = fit(fcn,X,Y,A0,B=[],g=[],h=[],Ex=0,Ey=0,dfcn=0)
   k = length(A0);
   N = length(X);
   grad=[];hess=[];
+  res = zeros(1,length(A0)+2);
   if length(class(g))!=length("function_handle") && length(class(h))!=length("function_handle") && (columns(B)==0 || rows(B)==0)
-    [res,dist,inf,out,grad,hess]= fminunc(f,A0); % Busco el conjunto A que minimiza el error
+    [res(1:k),res(k+1),inf,out,grad,hess]= fminunc(f,A0); % Busco el conjunto A que minimiza el error
   else
     if (columns(B)==0 || rows(B)==0)
-      res = sqp(A0',f,h,g)';
+      res(1:k) = sqp(A0',f,h,g)';
     else
-      res = sqp(A0',f,h,g,B(1,:),B(2,:))';
+      res(1:k) = sqp(A0',f,h,g,B(1,:),B(2,:))';
     endif
     grad = gradiente(f,res);
     hess = hessiano(f,res);
+    res(k+1) = f(res(1:k));
   endif
-  res = [res 0];
   A_ = inv(hess);
-  res(k+1) = corr(fcn(X,res),Y)^2;   % R-square (ver en linfit)
+  res(k+2) = corr(fcn(X,res(1:k)),Y)^2;   % R-square (ver en linfit)
   if Ex != 0 || Ey!=0
     if class(Ex)=="double" && length(Ex)==1
       Ex = ones(1,length(X))*Ex;
@@ -67,17 +73,16 @@ function [res,error] = fit(fcn,X,Y,A0,B=[],g=[],h=[],Ex=0,Ey=0,dfcn=0)
       plot(X,fcn(X,res(1:length(res)-1)),"r");
       hold off;
     endif
-  endif      
+  endif
+  res(k+1) = res(k+1)/(length(X)-length(A0));  
 endfunction
 % Ajusta una funcion cualquiera a una serie de puntos (X,Y).
 % La funcion fcn debe tener la forma fcn(x,A) donde x son los puntos
 % y A es un vector con todos los parametros a ajustar.
 % Aca A0 es un vector inicial de donde empieza a buscar.
-% Aun no pude incluir los errores de X e Y, asi que los parametros
-% se devuelven sin error.
-% El �ltimo elemento del resultado (res) ser� el R-square del ajuste 
-% (la forma en que lo calculo es dudosa, pero suena coherente). El 
-% resto son los par�metros en el orden en que aparecen en fcn.
+% Los últimos dos elementos del resultado son el coeficiente reduced chi-square
+% (si hay errores, está pesado por ellos) y el R-square, respectivamente.
+% El resto son los par�metros en el orden en que aparecen en fcn.
 % Si no se especifican errores, devuelve el par�metro "error" vac�o.
 % Al especificar los errores, puede agregarse opcionalmente una funci�n
 % que represente la derivada anal�tica de fcn. Si no se proporciona, se
@@ -86,7 +91,7 @@ endfunction
 % asignando de la forma
   % >> [parametros, errores] = fit(...)
   
-% OJO: La funci�n fcn (y dfcn)debe poder tomar un vector de x como par�metro.
+% OJO: La funci�n fcn (y dfcn) debe poder tomar un vector de x como par�metro.
 % Esto en general no es un problema si est�n usando funciones b�sicas
 % de Octave, ya que los operadores y funciones suelen estar sobrecargados
 % y, en el caso de matrices, se aplican elemento a elemento.
@@ -119,7 +124,7 @@ endfunction
   % >> fit(ExpRara,X,Y,[1,1,1])
   % ans =
 
-  %    1.999155   0.500038   0.057407   1.000000
+  %    1.999155   0.500038   0.057407   1.000000   (Ejemplo Pre-Chi)
   
 % As� que podr�amos decir que le peg� bastante bien, excepto en la
 % ordenada, donde le iba a pifiar porque justo ah� estaba el rand.
@@ -187,6 +192,15 @@ endfunction
 
 % DISCLAIMER: Se ahorran los "[]" pero tienen que agregar el "SR", piensenlo...
 
+%%% ACTUALIZACION: Reduced weighted chi-square 
+% Ahora fit calcula los parámetros óptimos buscando minimizar el reduced weighted
+% chi-square (osea, le da más bola a los puntos con menos error) si se proporcionan
+% los errores. Sino, lo hace en base al reduced chi-square (como antes).
+% En cada caso, devuelve el valor del indicador para estimar la bondad del ajuste.
+% Por si no recuerdan, a grandes rasgos un chi^2>>1 implicaba un mal ajuste y un
+% chi^2<1 implicaba un sobreajuste o errores de Y sobrestimados. Un chi^2~1 
+% implica que todo va bien.
+
 
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
@@ -214,7 +228,12 @@ function res = linfit(X,Ex,Y,Ey)
   dmdx = (Y+y-2*(res(1)*X+res(3)))/aux1;
   res(2) = sqrt((dmdx.^2)*(Ex'.^2)+(dmdy.^2)*(Ey'.^2));
   res(4) = sqrt((res(1)/N+x*dmdx).^2*Ex'.^2+(1/N-x*dmdy).^2*Ey'.^2);
-  res(5) = corr(X,Y)^2; % La covarianza entre X e Y
+  if Ey==0
+    res(5) = sum((Y-res(1)*X-res(3)).^2)/(N-2); % Reduced Chi-square
+  else
+    res(5) = sum(((Y-res(1)*X-res(3))./Ey).^2)/(N-2); % Reduced weighted
+  endif                                               % Chi-square
+  res(6) = corr(X,Y)^2; % La covarianza entre X e Y
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square
   if T
@@ -229,7 +248,7 @@ function res = linfit(X,Ex,Y,Ey)
   endif
 endfunction
 % Hace un ajuste lineal de (X,Y) con m*x+b devolviendo, en orden:
-%     m, delta m, b, delta b, R-square
+%     m, delta m, b, delta b, chi-square, R-square
 
 
 function res = IntConf(X,p=.95)

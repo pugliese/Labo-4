@@ -5,6 +5,12 @@ function [res,error] = fit(fcn,X,Y,A0,B=[],g=[],h=[],Ex=0,Ey=0,dfcn=0)
   f = @(A) sum((Y-fcn(X,A)).^2); % Defino la funci�n que devuelve el
 % error cuadr�tico (como la m�trica de L2) entre los Y(i) y la funci�n
 % para un dado conjunto de par�metros A
+  if iscolumn(X)
+    X = X';
+  endif
+  if iscolumn(Y)
+    Y = Y';
+  endif
   k = length(A0);
   N = length(X);
   grad=[];hess=[];
@@ -185,10 +191,16 @@ endfunction
 function res = linfit(X,Ex,Y,Ey)
   assert(length(X)==length(Y)) % Chequeo que las longitudes coincidan
   if class(Ex)=="double" && length(Ex)==1
-    Ex = ones(1,length(X))*Ex;
+    Ex = ones(rows(X),columns(X))*Ex;
   endif
   if class(Ey)=="double" && length(Ey)==1
-    Ey = ones(1,length(Y))*Ey;
+    Ey = ones(rows(Y),columns(Y))*Ey;
+  endif
+  if iscolumn(X)
+    X = X';
+  endif
+  if iscolumn(Y)
+    Y = Y';
   endif
   T = yes_or_no("Graficar?: ");
   N = length(X);
@@ -206,7 +218,11 @@ function res = linfit(X,Ex,Y,Ey)
 % dividido el producto de los desvios estandar nos da el coeficiente de
 % correlacion (creo que es el Pearson's R), cuyo cuadrado es el R-square
   if T
-    errorbar(X,Y,Ex,Ey,"~>o");
+    if Ex==0 && Ey==0
+      plot(X,Y,".")
+    else
+      errorbar(X,Y,Ex,Ey,"~>o");
+    endif
     hold on;
     plot(X,res(1)*X+res(3),"r");
     hold off;

@@ -15,22 +15,22 @@ endfunction
 % Es muy bueno cuando tenés razones para creer que el DeltaX es aproximadamente
 % constante a lo largo de la función.
 
-function [Xs,Ys] = smoothG(X,Y,s,n=0)    % Gaussian Smoothing
+function [Xs,Ys] = smoothG(X,Y,s,n=floor(length(X)*10*s/(X(length(X))-X(1))))    % Gaussian Smoothing
   assert(length(X)==length(Y))      % s es el "desvio estandar" representa una
   N = length(X);                    % especie de rango donde los puntos "aportan"
   
   if n==0   % El promediado se hace en todo el rango posible
     for i=1:N 
-      Gx = exp(-.5*((X-X(i))/s).^2)/(s*sqrt(2*pi));  % Peso de cada punto
-      Ys(i) = Gx*Y';                              % dependiendo de su distancia
+      Gx = exp(-.5*((X-X(i))/s).^2);  % Peso de cada punto
+      Ys(i) = Gx*Y'/sum(Gx);          % dependiendo de su distancia
     endfor
     Xs = X;
   elseif n<0   % Los n negativos implica que se filtren puntos
     M = floor(N/n);
     for i=1:(M-1)
       Xs(i) = sum(X(i*n:(i+1)*n))/n;
-      Gx = exp(-.5*((X(i*n:(i+1)*n)-Xs(i))/s).^2)/(s*sqrt(2*pi)); % Peso de cada
-      Ys(i) = Gx*Y(i*n:(i+1)*n)';            % punto dependiendo de su distancia
+      Gx = exp(-.5*((X(i*n:(i+1)*n)-Xs(i))/s).^2); % Peso de cada
+      Ys(i) = Gx*Y(i*n:(i+1)*n)'/sum(Gx);            % punto dependiendo de su distancia
     endfor
     if n*M<N
       Xs(M) = sum(X(n*M:N))/n;
